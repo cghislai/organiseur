@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            Édition des emplacements
+        </ui:define>
+        <ui:define name="body">
+            <h:form id="searchForm">
+
+            </h:form>
+            <h:form id="listForm">
+                <p:commandButton action="#{locationsController.actionNewLocation()}"
+                                 value="Nouvel emplacement" 
+                                 process="@this" update=":editForm"/>
+                <p:dataTable value="#{locationsController.locationDataModel}"
+                             var="location" lazy="true"
+                             rows="20">
+                    <p:column headerText="Nom">
+                        #{location.name}
+                    </p:column>
+                    <p:column headerText="Code postal">
+                        #{location.postalCode}
+                    </p:column>
+                    <p:column headerText="Localité">
+                        #{location.city}
+                    </p:column>
+                    <p:column headerText="Actions">
+                        <p:commandButton action="#{locationsController.actionEditLocation(location)}"
+                                         value="Modifier"
+                                         update=":editForm"/>
+                        <p:commandButton action="#{locationsController.actionDeleteLocation(location)}"
+                                         value="Supprimer"
+                                         update=":listForm"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+            <h:form id="editForm">
+                <p:dialog rendered="#{locationsController.editing}"
+                          closable="false"
+                          visible="true"
+                          header="Édition d'un emplacement"
+                          id="editDialog">
+                    <c:set value="#{locationsController.editingLocation}"
+                           var="location"/>
+                    <p:outputPanel>
+                        <h:panelGrid columns="2">
+                            <h:outputLabel value="Nom: "/>
+                            <h:inputText value="#{location.name}" required="true" />
+                            <h:outputLabel value="Adresse: "/>
+                            <h:inputText value="#{location.address}" required="true" />
+                            <h:outputLabel value="Code postal: "/>
+                            <h:inputText value="#{location.postalCode}" required="true" />
+                            <h:outputLabel value="Localité: "/>
+                            <h:inputText value="#{location.city}" required="true" />
+                        </h:panelGrid>
+                        <p:commandButton value="Enregistrer"
+                                         action="#{locationsController.actionSaveLocation()}"
+                                         update=":listForm :editForm"/>
+                        <p:commandButton value="Annuler"
+                                         action="#{locationsController.actionCancelEdit()}"
+                                         immediate="true"
+                                         update=":editForm"/>
+                    </p:outputPanel>
+                </p:dialog>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

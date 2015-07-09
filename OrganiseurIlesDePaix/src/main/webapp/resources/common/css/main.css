@@ -9,6 +9,7 @@ and open the template in the editor.
 */
 body {
     margin: 0;
+    font-family: sans-serif;
 }
 header.mainHeader {
     background-color: #EA2E49;
@@ -24,6 +25,27 @@ header.mainHeader {
     display: inline-block;
     vertical-align: middle;
     color: #001156;
+}
+.mainHeader form {
+    display: inline;
+}
+
+.mainHeader form#toolsForm {
+    float: right;
+}
+
+nav#mainNav {
+    padding: 0.2em;
+}
+
+nav#mainNav a {
+    font-size: 1em;
+    font-weight: bolder;
+    color: white;
+    text-decoration: none;
+}
+nav#mainNav a:hover {
+    color: yellow;
 }
 
 div.content {

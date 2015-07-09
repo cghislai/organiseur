@@ -2,7 +2,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title><ui:insert name="title">Organiseur Iles de Paix</ui:insert></title>
         <meta charset="UTF-8"/>
@@ -12,13 +13,21 @@
     </h:head>
     <h:body>
         <header class="mainHeader">
-            <h:graphicImage name="img/logo.png"
-                            library="common"
-                            styleClass="logo"
-                            width="128"/>
+            <h:link outcome="/index.jsf">
+                <h:graphicImage name="img/logo.png"
+                                library="common"
+                                styleClass="logo"
+                                width="128"/>
+            </h:link>
             <h:outputText styleClass="title"
                           value="Organisation des bénévoles"/>
-            <nav>
+            <h:form id="toolsForm" rendered="#{authController.adminAuthenticated}">
+                <p:menuButton value="Outils">
+                    <p:menuitem outcome="/tools/locations"
+                                value="Emplacements"/>
+                </p:menuButton>
+            </h:form>
+            <nav id="mainNav">
                 <h:link outcome="/user/login"
                         rendered="#{not authController.userAuthenticated}"
                         value="Se connecter"/>
@@ -30,6 +39,7 @@
             </nav>
         </header>
         <div class="content">
+            <h1><ui:insert name="title"/></h1>
             <ui:insert name="body"/>
         </div>
     </h:body>

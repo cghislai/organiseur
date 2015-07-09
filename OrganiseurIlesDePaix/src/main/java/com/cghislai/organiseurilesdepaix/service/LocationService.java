@@ -96,6 +96,7 @@ public class LocationService {
     }
 
     public void removeLocation(Location location) {
-        entityManager.remove(location);
+        Location managedLocation = entityManager.merge(location);
+        entityManager.remove(managedLocation);
     }
 }

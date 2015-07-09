@@ -10,6 +10,9 @@
         <ui:define name="title">
             Édition des emplacements
         </ui:define>
+        <ui:define name="head">
+            <script src="http://maps.google.com/maps/api/js?sensor=false"/>
+        </ui:define>
         <ui:define name="body">
             <h:form id="searchForm">
 
@@ -39,6 +42,12 @@
                                          update=":listForm"/>
                     </p:column>
                 </p:dataTable>
+
+                <p:gmap id="gmap" center="50.671952,4.5678592" zoom="13" 
+                        type="HYBRID" model="#{locationsController.mapModel}"  style="width:100%;height:400px">
+                    <p:ajax event="overlaySelect" listener="#{locationsController.onMarkerSelect}"
+                            update=":editForm"/>
+                </p:gmap>
             </h:form>
             <h:form id="editForm">
                 <p:dialog rendered="#{locationsController.editing}"
@@ -49,6 +58,7 @@
                     <c:set value="#{locationsController.editingLocation}"
                            var="location"/>
                     <p:outputPanel>
+                        <p:messages for=":editForm"/>
                         <h:panelGrid columns="2">
                             <h:outputLabel value="Nom: "/>
                             <h:inputText value="#{location.name}" required="true" />
@@ -58,7 +68,14 @@
                             <h:inputText value="#{location.postalCode}" required="true" />
                             <h:outputLabel value="Localité: "/>
                             <h:inputText value="#{location.city}" required="true" />
+                            <h:outputLabel value="Latitude:"/>
+                            <h:outputText value="#{location.latitude}"/>
+                            <h:outputLabel value="Longitude:"/>
+                            <h:outputText value="#{location.longitude}"/>
                         </h:panelGrid>
+                        <p:commandButton value="Rechercher"
+                                         action="#{locationsController.actionSeachCoordinates()}"
+                                         update=":editForm"/>
                         <p:commandButton value="Enregistrer"
                                          action="#{locationsController.actionSaveLocation()}"
                                          update=":listForm :editForm"/>
@@ -66,6 +83,7 @@
                                          action="#{locationsController.actionCancelEdit()}"
                                          immediate="true"
                                          update=":editForm"/>
+
                     </p:outputPanel>
                 </p:dialog>
             </h:form>

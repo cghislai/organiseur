@@ -6,6 +6,7 @@
 package com.cghislai.organiseurilesdepaix.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,6 +33,10 @@ public class Location implements Serializable {
     private String postalCode;
     @Column(nullable = false)
     private String city;
+    @Column
+    private BigDecimal latitude;
+    @Column
+    private BigDecimal longitude;
 
     public Long getId() {
         return id;
@@ -71,6 +76,22 @@ public class Location implements Serializable {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
     }
 
     @Override

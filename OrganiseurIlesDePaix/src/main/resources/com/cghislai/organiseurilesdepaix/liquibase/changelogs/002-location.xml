@@ -30,4 +30,10 @@
             VALUES ("admin", "admin@nomail.com", "", TRUE);
         </sql>
     </changeSet>
+    <changeSet id="2" author="cghislai">
+        <addColumn tableName="location">
+            <column name="LATITUDE" type="FLOAT(10)" />
+            <column name="LONGITUDE" type="FLOAT(10)" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

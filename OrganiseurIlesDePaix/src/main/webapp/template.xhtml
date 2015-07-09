@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title><ui:insert name="title">Organiseur Iles de Paix</ui:insert></title>
+        <meta charset="UTF-8"/>
+        <h:outputStylesheet name="css/main.css"
+                            library="common"/>
+        <ui:insert name="head"/>
+    </h:head>
+    <h:body>
+        <header class="mainHeader">
+            <h:graphicImage name="img/logo.png"
+                            library="common"
+                            styleClass="logo"
+                            width="128"/>
+            <h:outputText styleClass="title"
+                          value="Organisation des bénévoles"/>
+            <nav>
+                <h:link outcome="/user/login"
+                        rendered="#{not authController.userAuthenticated}"
+                        value="Se connecter"/>
+                <h:form id="logoutForm"
+                        rendered="#{authController.userAuthenticated}">
+                    <h:commandLink action="#{authController.actionDeauthentivateUser()}"
+                                   value="Se déconnecter"/>
+                </h:form>
+            </nav>
+        </header>
+        <div class="content">
+            <ui:insert name="body"/>
+        </div>
+    </h:body>
+</html>
+

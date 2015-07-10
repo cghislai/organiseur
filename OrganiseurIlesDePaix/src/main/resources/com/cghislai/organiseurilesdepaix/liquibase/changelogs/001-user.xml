@@ -30,4 +30,9 @@
             VALUES ("admin", "admin@nomail.com", "", TRUE);
         </sql>
     </changeSet>
+    <changeSet id="2" author="cghislai">
+        <addColumn tableName="ouser">
+            <column name="HUMAN_NAME" type="MEDIUMTEXT"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

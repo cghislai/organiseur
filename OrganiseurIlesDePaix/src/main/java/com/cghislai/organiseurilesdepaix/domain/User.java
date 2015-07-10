@@ -31,6 +31,8 @@ public class User {
     private String passwordHash;
     @Column(name = "IS_ADMIN", nullable = false)
     private boolean admin;
+    @Column(name = "HUMAN_NAME")
+    private String humanName;
 
     public Long getId() {
         return id;
@@ -70,6 +72,14 @@ public class User {
 
     public void setAdmin(boolean admin) {
         this.admin = admin;
+    }
+
+    public String getHumanName() {
+        return humanName;
+    }
+
+    public void setHumanName(String humanName) {
+        this.humanName = humanName;
     }
 
     @Override

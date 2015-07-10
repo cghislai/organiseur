@@ -7,6 +7,7 @@ package com.cghislai.organiseurilesdepaix.service;
 
 import com.cghislai.organiseurilesdepaix.domain.User;
 import com.cghislai.organiseurilesdepaix.domain.User_;
+import com.cghislai.organiseurilesdepaix.domain.util.Pagination;
 import com.cghislai.organiseurilesdepaix.service.search.UserSearch;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -57,7 +59,27 @@ public class UserService {
         query.where(predicates.toArray(new Predicate[0]));
 
         TypedQuery<User> typedQuery = entityManager.createQuery(query);
+        Pagination pagination = userSearch.getPagination();
+        if (pagination != null) {
+            typedQuery.setFirstResult(pagination.getFirstIndex());
+            typedQuery.setMaxResults(pagination.getPageSize());
+        }
         return typedQuery.getResultList();
+    }
+
+    public Long countUsers(UserSearch userSearch) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = builder.createQuery(Long.class);
+        Root<User> root = query.from(User.class);
+
+        List<Predicate> predicates = applyUserSearch(userSearch, root, builder);
+        Expression<Long> userCount = builder.count(root);
+
+        query.select(userCount);
+        query.where(predicates.toArray(new Predicate[0]));
+
+        TypedQuery<Long> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getSingleResult();
     }
 
     private List<Predicate> applyUserSearch(UserSearch userSearch, Root<User> root, CriteriaBuilder builder) {
@@ -74,7 +96,7 @@ public class UserService {
             Predicate pred = builder.equal(mailPath, mail);
             predicates.add(pred);
         }
-        String name = userSearch.getName();
+        String name = userSearch.getLogin();
         if (name != null) {
             Path<String> namePath = root.get(User_.userName);
             Predicate pred = builder.equal(namePath, name);
@@ -82,12 +104,12 @@ public class UserService {
         }
         String nameLike = userSearch.getNameLike();
         if (nameLike != null) {
-            Path<String> namePath = root.get(User_.userName);
-            final String nameExpression = "%" + name + "%";
+            Path<String> namePath = root.get(User_.humanName);
+            final String nameExpression = "%" + nameLike + "%";
             Predicate pred = builder.like(namePath, nameExpression);
             predicates.add(pred);
         }
-        String nameOrMail = userSearch.getNameOrMail();
+        String nameOrMail = userSearch.getLoginOrMail();
         if (nameOrMail != null) {
             Path<String> namePath = root.get(User_.userName);
             Path<String> mailPath = root.get(User_.email);
@@ -111,5 +133,15 @@ public class UserService {
         } catch (NonUniqueResultException | NoResultException exception) {
             return null;
         }
+    }
+
+    public User saveUser(User user) {
+        User managedUser = entityManager.merge(user);
+        return managedUser;
+    }
+
+    public void removeUser(User user) {
+        User managedUser = entityManager.merge(user);
+        entityManager.remove(managedUser);
     }
 }

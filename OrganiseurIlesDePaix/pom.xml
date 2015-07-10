@@ -44,6 +44,12 @@
             <artifactId>primefaces</artifactId>  
             <version>5.2</version>  
         </dependency>
+        <dependency>
+            <groupId>org.omnifaces</groupId>
+            <artifactId>omnifaces</artifactId>
+            <version>2.1</version>
+        </dependency>
+
        
     </dependencies>
 

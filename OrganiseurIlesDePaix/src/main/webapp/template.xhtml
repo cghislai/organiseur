@@ -27,17 +27,26 @@
                                 value="Emplacements"/>
                     <p:menuitem outcome="/tools/campaigndates"
                                 value="Dates de campagne"/>
+                    <p:menuitem outcome="/tools/users"
+                                value="Utilisateurs"/>
                 </p:menuButton>
             </h:form>
             <nav id="mainNav">
                 <h:link outcome="/user/login"
                         rendered="#{not authController.userAuthenticated}"
                         value="Se connecter"/>
+                <h:link outcome="/user/register"
+                        rendered="#{not authController.userAuthenticated}"
+                        value="Créer un compte"/>
                 <h:form id="logoutForm"
                         rendered="#{authController.userAuthenticated}">
-                    <h:commandLink action="#{authController.actionDeauthentivateUser()}"
-                                   value="Se déconnecter"/>
+                    <p:commandLink action="#{authController.actionDeauthenticateUser()}"
+                                   value="Se déconnecter"
+                                   ajax="false"/>
                 </h:form>
+                <h:link outcome="/user/account"
+                        rendered="#{authController.userAuthenticated}"
+                        value="Modifier son compte"/>
             </nav>
         </header>
         <div class="content">

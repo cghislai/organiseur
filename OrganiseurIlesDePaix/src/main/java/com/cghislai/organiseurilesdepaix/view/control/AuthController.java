@@ -6,6 +6,7 @@
 package com.cghislai.organiseurilesdepaix.view.control;
 
 import com.cghislai.organiseurilesdepaix.domain.User;
+import com.cghislai.organiseurilesdepaix.view.Views;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,7 +35,7 @@ public class AuthController implements Serializable {
         authenticatedUser = user;
     }
 
-    public void actionDeauthentivateUser() {
+    public String actionDeauthenticateUser() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
         HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
@@ -44,6 +45,7 @@ public class AuthController implements Serializable {
         } catch (ServletException ex) {
             Logger.getLogger(AuthController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return Views.INDEX;
     }
 
     public boolean isUserAuthenticated() {

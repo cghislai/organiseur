@@ -43,6 +43,8 @@ nav#mainNav a {
     font-weight: bolder;
     color: white;
     text-decoration: none;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
 }
 nav#mainNav a:hover {
     color: yellow;
@@ -53,7 +55,7 @@ div.content {
     text-align: center;
 }
 
-form#loginForm {
+form#loginForm, form#registerForm , form#modifyForm {
     text-align: center;
     margin: 1em;
     display: inline-block;

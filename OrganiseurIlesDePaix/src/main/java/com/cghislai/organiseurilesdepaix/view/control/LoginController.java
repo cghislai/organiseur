@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -54,19 +55,19 @@ public class LoginController implements Serializable {
             request.login(userNameOrMail, encodedPass);
             
             UserSearch userSearch = new UserSearch();
-            userSearch.setNameOrMail(userNameOrMail);
+            userSearch.setLoginOrMail(userNameOrMail);
             User user = userService.searchUser(userSearch);
             authController.actionAuthenticateUser(user);
             return Views.INDEX;
         } catch (ServletException ex) {
             onLoginFail(ex);
-            return Views.USER_LOGIN;
+            return null;
         }
     }
 
     private void onLoginFail(Exception exception) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erreur", exception.getLocalizedMessage());
+        FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Impossible d'ouvrir une session", "Vérifiez que le nom d'utilisateur et le mot de passe soient corrects");
         facesContext.addMessage(null, facesMessage);
     }
 
@@ -77,7 +78,9 @@ public class LoginController implements Serializable {
             }
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encoded = digest.digest(password.getBytes("UTF-8"));
-            String encodedString = new String(encoded, "UTF-8");
+            byte[] base64Encoded = Base64.getEncoder().encode(encoded);
+            String encodedString = new String(base64Encoded, "UTF-8");
+            
             return encodedString;
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
             Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);

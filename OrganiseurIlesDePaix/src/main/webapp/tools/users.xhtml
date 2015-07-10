@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            Édition des utilisateurs
+        </ui:define>
+        <ui:define name="body">
+            <h:form id="searchForm">
+                <h:panelGrid columns="3">
+                    <h:outputLabel value="Nom:"/>
+                    <p:inputText value="#{usersController.userSearch.nameLike}"/>
+                    <p:commandButton action="#{usersController.actionSearch()}"
+                                     value="Filtrer"
+                                     update=":listForm"/>
+                </h:panelGrid>
+            </h:form>
+            <h:form id="listForm">
+                <p:dataTable value="#{usersController.usersModel}"
+                             var="user"
+                             lazy="true"
+                             rows="30">
+                    <p:column headerText="Nom">
+                        <h:outputText value="#{user.humanName}"/>
+                    </p:column>
+                    <p:column headerText="Login">
+                        <h:outputText value="#{user.userName}"/>
+                    </p:column>
+                    <p:column headerText="E-mail">
+                        <h:outputText value="#{user.email}"/>
+                    </p:column>
+                    <p:column headerText="Admin">
+                        <h:selectBooleanCheckbox value="#{user.admin}"
+                                                 disabled="true"/>
+                    </p:column>
+                    <p:column headerText="Actions">
+                        <p:commandButton action="#{usersController.actionDelete(user)}"
+                                         value="Supprimer"
+                                         update=":listForm">
+                            <p:confirm header="Confirmation" message="Voulez-vous vraiment supprimer cet utilisateur ?" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+                <p:confirmDialog global="true" >
+                    <p:commandButton value="Oui" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="Non" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

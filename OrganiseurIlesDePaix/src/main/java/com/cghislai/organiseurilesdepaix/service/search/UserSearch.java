@@ -5,6 +5,7 @@
  */
 package com.cghislai.organiseurilesdepaix.service.search;
 
+import com.cghislai.organiseurilesdepaix.domain.util.Pagination;
 import java.io.Serializable;
 
 /**
@@ -14,11 +15,12 @@ import java.io.Serializable;
 public class UserSearch implements Serializable {
 
     private Long userId;
-    private String nameOrMail;
-    private String name;
+    private String loginOrMail;
+    private String login;
     private String mail;
     private String nameLike;
     private Boolean admin;
+    private Pagination pagination;
 
     public Long getUserId() {
         return userId;
@@ -28,20 +30,20 @@ public class UserSearch implements Serializable {
         this.userId = userId;
     }
 
-    public String getNameOrMail() {
-        return nameOrMail;
+    public String getLoginOrMail() {
+        return loginOrMail;
     }
 
-    public void setNameOrMail(String nameOrMail) {
-        this.nameOrMail = nameOrMail;
+    public void setLoginOrMail(String loginOrMail) {
+        this.loginOrMail = loginOrMail;
     }
 
-    public String getName() {
-        return name;
+    public String getLogin() {
+        return login;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getMail() {
@@ -66,6 +68,14 @@ public class UserSearch implements Serializable {
 
     public void setAdmin(Boolean admin) {
         this.admin = admin;
+    }
+
+    public Pagination getPagination() {
+        return pagination;
+    }
+
+    public void setPagination(Pagination pagination) {
+        this.pagination = pagination;
     }
 
 }

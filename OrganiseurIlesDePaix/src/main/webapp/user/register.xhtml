@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:o="http://omnifaces.org/ui">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            Créer un compte
+        </ui:define>
+        <ui:define name="body">
+            <h:form id="registerForm">
+                <p:messages />
+                <p:focus/>
+                <h:panelGrid columns="2"
+                             style="text-align: center; margin: 1em;">
+                    <h:outputLabel value="Nom:"/>
+                    <p:inputText value="#{userRegisterController.humanName}"
+                                 id="nom"
+                                 required="true"
+                                 requiredMessage="Veuillez entrer un nom"
+                                 validatorMessage="Le nom doit faire minimum 4 charactères">
+                        <f:validateLength minimum="4"/>
+                    </p:inputText>
+                    <h:outputLabel value="E-mail:"/>
+                    <p:inputText value="#{userRegisterController.email}"
+                                 id="email"
+                                 required="true"
+                                 requiredMessage="Veuillez entrer un e-mail pour pouvoir vous contacter"
+                                 validatorMessage="L'adresse e-mail est incorrecte">
+                        <f:validateLength minimum="4"/>
+                        <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$"/>
+                    </p:inputText>
+                    <h:outputLabel value="Login:"/>
+                    <p:inputText value="#{userRegisterController.login}"
+                                 id="login"
+                                 required="true"
+                                 requiredMessage="Veuillez entrer un login"
+                                 validatorMessage="Le login doit faire au moins 4 charactères">
+                        <f:validateLength minimum="4"/>
+                    </p:inputText>
+                    <h:outputLabel value="Mot de passe:"/>
+                    <p:password value="#{userRegisterController.password1}"
+                                 id="motdepasse"
+                                 required="true"
+                                 requiredMessage="Veuillez entrer un mot de passe"
+                                 validatorMessage="Le mot de passe doit faire minimum 8 charactères">
+                        <f:validateLength minimum="8"/>
+                    </p:password>
+                    <h:outputLabel value="Vérifier le mot de passe:"/>
+                    <p:password value="#{userRegisterController.password2}"
+                                 id="confirmationmotdepasse"
+                                 required="true"
+                                 requiredMessage="Veuiller confirmer votre mot de passe"
+                                 validatorMessage="Le mot de passe doit faire minimum 8 charactères">
+                        <f:validateLength minimum="8"/>
+                        <o:validateEqual components="motdepasse confirmationmotdepasse"
+                                         message="Les mot de passe ne correspondent pas"/>
+                    </p:password>
+                </h:panelGrid>
+
+                <p:commandButton value="Enregistrer"
+                                 update="@form"
+                                 action="#{userRegisterController.actionRegister()}"/>
+                <p:commandLink value="Annuler"
+                               immediate="true"
+                               action="/index.jsf"/>
+            </h:form>
+
+        </ui:define>
+    </ui:composition>
+</html>
+

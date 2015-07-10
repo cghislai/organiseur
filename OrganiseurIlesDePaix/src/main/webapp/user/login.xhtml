@@ -10,19 +10,22 @@
         </ui:define>
         <ui:define name="body">
             <h:form id="loginForm">
-                <p:messages />
+                <p:messages showDetail="true"/>
                 <p:focus/>
-                <h:panelGrid columns="2"
-                             style="text-align: center; margin: 1em;">
-                    <h:outputLabel value="Login ou e-mail:"/>
-                    <p:inputText value="#{loginController.userNameOrMail}"/>
+                <p:outputPanel>
+                    <h:panelGrid columns="2"
+                                 style="text-align: center; margin: 1em; display: inline-block;">
+                        <h:outputLabel value="Login ou e-mail:"/>
+                        <p:inputText value="#{loginController.userNameOrMail}"/>
 
-                    <h:outputLabel value="Mot de passe"/>
-                    <p:password value="#{loginController.password}" />
-                </h:panelGrid>
+                        <h:outputLabel value="Mot de passe"/>
+                        <p:password value="#{loginController.password}" />
+                    </h:panelGrid>
+                </p:outputPanel>
 
                 <p:commandButton value="Se connecter"
-                                 action="#{loginController.actionLogin()}"/>
+                                 action="#{loginController.actionLogin()}"
+                                 update="@form"/>
             </h:form>
 
         </ui:define>

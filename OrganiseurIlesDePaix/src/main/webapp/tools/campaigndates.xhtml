@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            Édition des dates de campagne
+        </ui:define>
+        <ui:define name="body">
+            <h:form id="datesForm" style="max-width: 400px; display: inline-block;">
+                <p:dataList value="#{campaignDatesController.campaignDays}"
+                            var="campaignDay"
+                            emptyMessage="Aucune date"
+                            type="definition">
+                    <p:outputPanel style="padding: 0.1em;">
+                        <p:commandLink action="#{campaignDatesController.actionRemoveDate(campaignDay)}"
+                                       value="Supprimer"
+                                       style="float: right;"
+                                       update="@form"/>
+                        <h:outputText value="#{campaignDay.date}">
+                            <f:convertDateTime pattern="dd/MM/yyyy"
+                                               timeZone="Europe/Brussels"/>
+                        </h:outputText>
+                    </p:outputPanel>
+                </p:dataList>
+                <p:messages />
+                <h:panelGrid columns="2">
+                    <p:calendar value="#{campaignDatesController.toAddDate}"
+                                navigator="true" pattern="dd/MM/yyyy"
+                                timeZone="Europe/Brussels"
+                                placeholder="Nouvelle date"/>
+                    <p:commandButton action="#{campaignDatesController.actionAddDate()}"
+                                     update="@form"
+                                     value="Ajouter"/>
+                </h:panelGrid>
+            </h:form>
+
+        </ui:define>
+    </ui:composition>
+</html>
+

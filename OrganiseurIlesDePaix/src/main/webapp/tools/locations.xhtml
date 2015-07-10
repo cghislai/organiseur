@@ -23,6 +23,7 @@
                                  process="@this" update=":editForm"/>
                 <p:dataTable value="#{locationsController.locationDataModel}"
                              var="location" lazy="true"
+                             emptyMessage="Aucun emplacement"
                              rows="20">
                     <p:column headerText="Nom">
                         #{location.name}
@@ -68,6 +69,10 @@
                             <h:inputText value="#{location.postalCode}" required="true" />
                             <h:outputLabel value="Localité: "/>
                             <h:inputText value="#{location.city}" required="true" />
+                            <h:outputLabel value="Personnes requises : "/>
+                            <p:spinner value="#{location.requriedPersonAmount}" required="true">
+                                <f:validateDoubleRange minimum="1" />
+                            </p:spinner>
                             <h:outputLabel value="Latitude:"/>
                             <h:outputText value="#{location.latitude}"/>
                             <h:outputLabel value="Longitude:"/>

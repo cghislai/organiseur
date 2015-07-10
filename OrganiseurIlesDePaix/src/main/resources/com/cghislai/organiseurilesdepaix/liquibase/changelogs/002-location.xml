@@ -36,4 +36,9 @@
             <column name="LONGITUDE" type="FLOAT(10)" />
         </addColumn>
     </changeSet>
+    <changeSet id="3" author="cghislai">
+        <addColumn tableName="location">
+            <column name="PERSON_AMOUNT" type="INT" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

@@ -50,4 +50,11 @@ nav#mainNav a:hover {
 
 div.content {
     margin: 1em;
+    text-align: center;
+}
+
+form#loginForm {
+    text-align: center;
+    margin: 1em;
+    display: inline-block;
 }

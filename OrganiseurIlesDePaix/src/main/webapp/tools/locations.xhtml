@@ -34,6 +34,9 @@
                     <p:column headerText="Localité">
                         #{location.city}
                     </p:column>
+                    <p:column headerText="Personnes requises">
+                        #{location.requriedPersonAmount}
+                    </p:column>
                     <p:column headerText="Actions">
                         <p:commandButton action="#{locationsController.actionEditLocation(location)}"
                                          value="Modifier"
@@ -78,7 +81,7 @@
                             <h:outputLabel value="Longitude:"/>
                             <h:outputText value="#{location.longitude}"/>
                         </h:panelGrid>
-                        <p:commandButton value="Rechercher"
+                        <p:commandButton value="Localiser"
                                          action="#{locationsController.actionSeachCoordinates()}"
                                          update=":editForm"/>
                         <p:commandButton value="Enregistrer"

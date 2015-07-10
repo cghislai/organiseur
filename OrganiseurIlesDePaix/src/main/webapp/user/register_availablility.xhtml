@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:o="http://omnifaces.org/ui">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            Enregistrer ses disponibilités
+        </ui:define>
+        <ui:define name="head">
+            <script src="https://maps.google.com/maps/api/js?sensor=false"/>
+        </ui:define>
+        <ui:define name="body">
+            <p:outputPanel rendered="#{registerAvailabilityController.currentStep eq 'SELECT_DATES'}">
+
+                <h2>1. Disponibilités</h2>
+
+
+                <h:form id='selectDatesForm' styleClass="centerForm">
+                    <h:panelGrid columns="2">
+                        <h:panelGroup>
+                            <p>Choisissez les dates et heures pour lesquels vous êtes disponibles. Vous pourrez paufiner les horaires plus tard.</p>
+                            <p:dataList value="#{registerAvailabilityController.allDates}"
+                                        var="campaignDay"
+                                        type="definition">
+                                <p:outputPanel id="dayPanel" styleClass="availabilityDatesListItem">
+                                    <h:outputText value="#{campaignDay.date}"
+                                                  styleClass="date">
+                                        <f:convertDateTime pattern="EEEE dd/MM/yyyy"
+                                                           timeZone="Europe/Brussels"
+                                                           locale="fr_BE"/>
+                                    </h:outputText>
+                                    <p:commandButton rendered="#{not registerAvailabilityController.isDateSelected(campaignDay)}"
+                                                     action="#{registerAvailabilityController.actionSelectDate(campaignDay)}"
+                                                     value="Sélectionner"
+                                                     process="@this"
+                                                     update="dayPanel"/>
+                                    <p:outputPanel rendered="#{registerAvailabilityController.isDateSelected(campaignDay)}"
+                                                   style="display: inline-block;">
+                                        <c:set value="#{registerAvailabilityController.getTimeAvailability(campaignDay)}"
+                                               var="availability"/>
+                                        <h:panelGrid columns="2">
+                                            <h:outputLabel value="De:"/>
+                                            <p:calendar  value="#{availability.startTime}" pattern="HH:mm" timeOnly="true"  
+                                                         id="startTime"
+                                                         required="true"/>
+                                            <h:outputLabel value="A:"/>
+                                            <p:calendar  value="#{availability.endTime}" pattern="HH:mm" timeOnly="true"  
+                                                         id="endTime"
+                                                         required="true">
+                                                <o:validateOrder type="lt"
+                                                                 components="startTime endTime"
+                                                                 message="Heures incorrectes"/>
+                                            </p:calendar>
+                                        </h:panelGrid>
+                                        <p:commandLink   action="#{registerAvailabilityController.actionUnselectDate(campaignDay)}"
+                                                         value="Annuler"
+                                                         immediate="true"
+                                                         update="dayPanel"/>
+                                    </p:outputPanel>
+                                </p:outputPanel>
+                            </p:dataList>
+                        </h:panelGroup>
+                        <p:outputPanel>
+                            <p>Si vous venez avec des amis ou en famille, indiquez ici le nombre de personne. Vous pourrez modifier en détails plus tard.</p>
+                            <h:outputLabel value="Nombre de personnes:"/>
+                            <p:spinner value="#{registerAvailabilityController.personAmount}" required="true"/>
+                        </p:outputPanel>
+                    </h:panelGrid>
+                    <p:commandButton value="Suivant"
+                                     action="#{registerAvailabilityController.actionSwitchToStep('SELECT_LOCATIONS')}"         
+                                     process="@form"
+                                     ajax="false"/>
+                </h:form>
+            </p:outputPanel>
+
+
+            <p:outputPanel rendered="#{registerAvailabilityController.currentStep eq 'SELECT_LOCATIONS'}">
+                <h:form styleClass="availabilityPrevButton">
+                    <p:commandButton value="Précédent"
+                                     action="#{registerAvailabilityController.actionSwitchToStep('SELECT_DATES')}"         
+                                     ajax="false"/>
+                </h:form>
+                <h:form styleClass="availabilityNextButton">
+                    <p:commandButton value="Suivant"
+                                     action="#{registerAvailabilityController.actionFinish()}"         
+                                     ajax="false"/>
+                </h:form>
+                <h2>2. Choisir ses emplacements</h2>
+                <p>Choisissez les emplacements où vous pourrez vous rendre.</p>                    
+
+                <h:panelGrid columns="2" columnClasses="locationsLeftCol, locationsRightCol"
+                             style="width: 100%;">
+                    <p:outputPanel id="listColumn">
+                        <p:panel header="Recherche" collapsed="false" toggleable="true">
+                            <h:form id="searchLocationForm">
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="Nom:" />
+                                    <p:inputText value="#{registerAvailabilityController.locationSearch.nameLike}"/>
+                                    <h:outputLabel value="Ville:" />
+                                    <p:inputText value="#{registerAvailabilityController.locationSearch.cityLike}"/>
+                                    <h:outputLabel value="Code postal:" />
+                                    <p:inputText value="#{registerAvailabilityController.locationSearch.postalCode}"/>
+                                </h:panelGrid>
+                                <p:commandButton value="Rechercher"
+                                                 action="#{registerAvailabilityController.actionSearchLocations()}"
+                                                 update=":listLocationForm"/>
+                            </h:form>
+                        </p:panel>
+                        <h:form id="listLocationForm">
+                            <p:dataList value="#{registerAvailabilityController.locationsModel}"
+                                        var="location"
+                                        lazy="true"
+                                        rows="20"
+                                        type="definition">
+                                <h:panelGrid columns="2" columnClasses="locationItemCol, locationItemActionCol"
+                                             styleClass="locationItemTable">
+                                    <p:outputPanel styleClass="locationListItem">
+                                        <h3>#{location.name}</h3>
+                                        <p class="address">#{location.address}, #{location.postalCode} #{location.city}</p>
+                                        <p class="requiredAmount">#{location.requriedPersonAmount} personne(s) requise(s)</p>
+                                    </p:outputPanel>
+                                    <p:outputPanel id='locationListSelectionPanel'
+                                                   styleClass="locationListSelectionPanel">
+                                        <p:commandButton value="Sélectionner"
+                                                         rendered="#{not registerAvailabilityController.isLocationSelected(location)}"
+                                                         action="#{registerAvailabilityController.actionSelectLocation(location)}"
+                                                         update="locationListSelectionPanel :mapForm:gmap"/>
+                                        <p:commandLink value="Annuler"
+                                                       rendered="#{registerAvailabilityController.isLocationSelected(location)}"
+                                                       action="#{registerAvailabilityController.actionUnselectLocation(location)}"
+                                                       update="locationListSelectionPanel :mapForm:gmap"/>
+                                    </p:outputPanel>
+                                </h:panelGrid>
+                            </p:dataList>
+                        </h:form>
+                    </p:outputPanel>
+                    <h:form id='mapForm' style="display: inline-block; width: 100%; height: 100%;">
+                        <p:gmap id="gmap" center="50.671952,4.5678592" zoom="13" 
+                                type="HYBRID" model="#{registerAvailabilityController.googleMapModel}" style="width: 100%; height: 100%;"
+                                fitBounds="true">
+                            <p:ajax event="overlaySelect" listener="#{registerAvailabilityController.onMarkerSelect}"
+                                    update=":listLocationForm :mapForm:gmap"/>
+                        </p:gmap>
+                    </h:form>
+
+                </h:panelGrid>
+            </p:outputPanel>
+
+        </ui:define>
+    </ui:composition>
+</html>
+

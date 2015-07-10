@@ -15,5 +15,6 @@ public class Views {
 
     public static final String INDEX = "/index" + EXTENTION_REDIRECT;
     public static final String USER_LOGIN = "/user/login" + EXTENTION_REDIRECT;
+    public static final String USER_AVAILABILITIES = "/user/availabilities" + EXTENTION_REDIRECT;
     public static final String TOOLS_LOCATIONS = "/tools/locations" + EXTENTION_REDIRECT;
 }

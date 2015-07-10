@@ -7,14 +7,18 @@ package com.cghislai.organiseurilesdepaix.service;
 
 import com.cghislai.organiseurilesdepaix.domain.Location;
 import com.cghislai.organiseurilesdepaix.domain.Location_;
+import com.cghislai.organiseurilesdepaix.domain.util.LocationCoordinateInfo;
 import com.cghislai.organiseurilesdepaix.domain.util.Pagination;
 import com.cghislai.organiseurilesdepaix.service.search.LocationSearch;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CompoundSelection;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
@@ -59,10 +63,33 @@ public class LocationService {
         Expression<Long> count = builder.count(root);
         query.select(count);
         query.where(predicates.toArray(new Predicate[0]));
-        
-        
+
         TypedQuery<Long> typedQuery = entityManager.createQuery(query);
         return typedQuery.getSingleResult();
+    }
+
+    public List<LocationCoordinateInfo> findCoordinates(LocationSearch locationSearch) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<LocationCoordinateInfo> query = builder.createQuery(LocationCoordinateInfo.class);
+        Root<Location> root = query.from(Location.class);
+
+        List<Predicate> predicates = applyLocationSearch(locationSearch, root, builder);
+
+        Path<BigDecimal> latitudePath = root.get(Location_.latitude);
+        Path<BigDecimal> longitudePath = root.get(Location_.longitude);
+        Path<String> namePath = root.get(Location_.name);
+
+        CompoundSelection<LocationCoordinateInfo> cooridnateConstruct = builder.construct(LocationCoordinateInfo.class, latitudePath, longitudePath, namePath);
+        query.select(cooridnateConstruct);
+        query.where(predicates.toArray(new Predicate[0]));
+
+        TypedQuery<LocationCoordinateInfo> typedQuery = entityManager.createQuery(query);
+        final Pagination pagination = locationSearch.getPagination();
+        if (pagination != null) {
+            typedQuery.setFirstResult(pagination.getFirstIndex());
+            typedQuery.setMaxResults(pagination.getPageSize());
+        }
+        return typedQuery.getResultList();
     }
 
     private List<Predicate> applyLocationSearch(LocationSearch locationSearch, Root<Location> root, CriteriaBuilder builder) {

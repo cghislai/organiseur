@@ -70,6 +70,25 @@ public class CampaignDatesService implements Serializable {
         TypedQuery<Long> typedQuery = entityManager.createQuery(query);
         return typedQuery.getSingleResult();
     }
+    public CampaignDay getCampaignDays(CampaignDaySearch search) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CampaignDay> query = builder.createQuery(CampaignDay.class);
+        Root<CampaignDay> root = query.from(CampaignDay.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        Date date = search.getDate();
+        if (date != null) {
+            Path<Date> datePath = root.get(CampaignDay_.date);
+            Predicate pred = builder.equal(datePath, date);
+            predicates.add(pred);
+        }
+
+        query.select(root);
+        query.where(predicates.toArray(new Predicate[0]));
+
+        TypedQuery<CampaignDay> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getSingleResult();
+    }
 
     public CampaignDay saveCampaignDay(CampaignDay campaignDay) {
         CampaignDay managedCampaignDay = entityManager.merge(campaignDay);

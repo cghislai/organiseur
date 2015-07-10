@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,10 @@ import javax.servlet.http.HttpServletRequest;
 @SessionScoped
 public class AuthController implements Serializable {
 
+    @Inject
+    private UserSessionController userSessionController;
+    
+    
     private User authenticatedUser;
 
     public User getAuthenticatedUser() {
@@ -33,6 +38,7 @@ public class AuthController implements Serializable {
 
     public void actionAuthenticateUser(User user) {
         authenticatedUser = user;
+        userSessionController.updateAvailabilities();;
     }
 
     public String actionDeauthenticateUser() {
@@ -42,6 +48,7 @@ public class AuthController implements Serializable {
         try {
             request.logout();
             authenticatedUser = null;
+            userSessionController.updateAvailabilities();;
         } catch (ServletException ex) {
             Logger.getLogger(AuthController.class.getName()).log(Level.SEVERE, null, ex);
         }

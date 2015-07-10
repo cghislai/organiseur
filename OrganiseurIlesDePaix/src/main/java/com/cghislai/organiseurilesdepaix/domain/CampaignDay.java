@@ -69,4 +69,9 @@ public class CampaignDay implements Serializable {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "CampaignDay{" + "id=" + id + '}';
+    }
+
 }

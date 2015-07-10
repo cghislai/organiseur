@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            Modifier ses disponibilités
+        </ui:define>
+        <ui:define name="body">
+            <h:form>
+                <p:outputPanel id="calendar">
+                    <table>
+                        <tr>
+                            <ui:repeat value="#{availabilitiesController.locations}"
+                                       var="location">
+                                <th>#{location.name}</th>
+                            </ui:repeat>
+                        </tr>
+                        <ui:repeat value="#{availabilitiesController.campaignDays}"
+                                   var="campaignDay">
+                            <tr>
+                                <ui:repeat value="#{availabilitiesController.locations}"
+                                           var="location">
+                                    <td>
+                                        <p:outputPanel style="height: 460px; width: 240px;">
+
+                                            <p:schedule allDaySlot="false"
+                                                        clientTimeZone="Europe/Brussels"
+                                                        initialDate="#{campaignDay.date}"
+                                                        showHeader="false"
+                                                        timeFormat="HH:mm"
+                                                        timeZone="Europe/Brussels"
+                                                        locale="fr_BE"
+                                                        view="agendaDay"
+                                                        maxTime="21:00"
+                                                        minTime="7:00"
+                                                        aspectRatio="0.6"
+                                                        slotDuration="01:00:00"
+                                                        columnFormat="dddd DD/MM/YYYY"
+                                                        axisFormat="HH:mm"
+                                                        style="height: 420px; overflow: hidden;"
+                                                        value="#{availabilitiesController.getScheduleModel(location, campaignDay)}">
+                                                <p:ajax event="eventSelect" listener="#{availabilitiesController.onEventSelect}" update="@form:eventDetails" oncomplete="PF('eventDialog').show();" />
+                                                <p:ajax event="eventMove" listener="#{availabilitiesController.onEventMove}" />
+                                                <p:ajax event="eventResize" listener="#{availabilitiesController.onEventResize}" />
+                                            </p:schedule>
+                                            <p:commandLink value="Ajouter un tranche horaire"
+                                                           actionListener="#{availabilitiesController.actionNewEvent(campaignDay, location)}"
+                                                           update="@form:eventDetails" oncomplete="PF('eventDialog').show();" />
+                                        </p:outputPanel>
+                                    </td>
+                                </ui:repeat>
+                            </tr>
+                        </ui:repeat>
+                    </table>
+                </p:outputPanel>
+                <p:dialog widgetVar="eventDialog" header="Détails">
+                    <p:outputPanel id="eventDetails">
+
+
+                        <h:panelGrid  columns="2" rendered="#{not empty availabilitiesController.editingAvailability}">
+                            <h:outputLabel value="Date:" />
+                            <h:outputText value="#{availabilitiesController.editingAvailability.campaignDay.date}">
+                                <f:convertDateTime pattern="EEEE dd/MM/yyyy"
+                                                   timeZone="Europe/Brussels"
+                                                   locale="fr_BE"/>
+                            </h:outputText>
+                            <h:outputLabel value="Emplacement:" />
+                            <h:outputText value="#{availabilitiesController.editingAvailability.location.name}"/>
+
+                            <h:outputLabel for="from" value="De:" />
+                            <p:inputMask id="from" value="#{availabilitiesController.editingAvailability.startTime}" mask="99:99">
+                                <f:convertDateTime pattern="HH:mm" timeZone="Europe/Brussels"/>
+                            </p:inputMask>
+                            <h:outputLabel for="to" value="À:" />
+                            <p:inputMask id="to" value="#{availabilitiesController.editingAvailability.endTime}" mask="99:99">
+                                <f:convertDateTime pattern="HH:mm" timeZone="Europe/Brussels"/>
+                            </p:inputMask>
+                            <h:outputLabel for="person" value="Nombre de personnes:" />
+                            <p:spinner value="#{availabilitiesController.editingAvailability.personAmount}" id="person">
+                                <f:validateLongRange minimum="1"/>
+                            </p:spinner>
+
+
+                            <p:commandButton id="addButton" value="Enregistrer"
+                                             actionListener="#{availabilitiesController.saveEvent()}" 
+                                             oncomplete="PF('eventDialog').hide();" 
+                                             update="calendar"/>
+                            <p:commandButton id="removeButton" value="Supprimer"
+                                             action="#{availabilitiesController.deleteEvent()}" 
+                                             oncomplete="PF('eventDialog').hide();" 
+                                             update="calendar"/>
+                        </h:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>    
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

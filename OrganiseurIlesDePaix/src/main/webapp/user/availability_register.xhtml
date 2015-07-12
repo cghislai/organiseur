@@ -21,9 +21,12 @@
 
 
                 <h:form id='selectDatesForm' styleClass="centerForm">
-                    <h:panelGrid columns="2">
+                    <h:panelGrid columns="2" styleClass="registerAvailabilitiesStep1Table">
                         <h:panelGroup>
-                            <p>Choisissez les dates et heures pour lesquels vous êtes disponibles. Vous pourrez paufiner les horaires plus tard.</p>
+                            <p:outputPanel styleClass="infoTip">
+                                <p>Choisissez les dates et heures pour lesquels vous êtes disponibles. 
+                                    Vous pourrez paufiner les horaires plus tard.</p>
+                            </p:outputPanel>
                             <p:dataList value="#{registerAvailabilityController.allDates}"
                                         var="campaignDay"
                                         type="definition">
@@ -43,7 +46,7 @@
                                                    style="display: inline-block;">
                                         <c:set value="#{registerAvailabilityController.getTimeAvailability(campaignDay)}"
                                                var="availability"/>
-                                        <h:panelGrid columns="2">
+                                        <h:panelGrid columns="2" >
                                             <h:outputLabel value="De:"/>
                                             <p:calendar  value="#{availability.startTime}" pattern="HH:mm" timeOnly="true"  
                                                          id="startTime"
@@ -66,15 +69,20 @@
                             </p:dataList>
                         </h:panelGroup>
                         <p:outputPanel>
-                            <p>Si vous venez avec des amis ou en famille, indiquez ici le nombre de personne. Vous pourrez modifier en détails plus tard.</p>
+                            <p:outputPanel styleClass="infoTip">
+                                <p>Si vous venez avec des amis ou en famille, indiquez ici le nombre de personne. Vous pourrez modifier en détails plus tard.</p>
+                            </p:outputPanel>
                             <h:outputLabel value="Nombre de personnes:"/>
                             <p:spinner value="#{registerAvailabilityController.personAmount}" required="true"/>
                         </p:outputPanel>
                     </h:panelGrid>
-                    <p:commandButton value="Suivant"
-                                     action="#{registerAvailabilityController.actionSwitchToStep('SELECT_LOCATIONS')}"         
-                                     process="@form"
-                                     ajax="false"/>
+                    <p:outputPanel>
+                        <p:commandButton value="Suivant"
+                                         action="#{registerAvailabilityController.actionSwitchToStep('SELECT_LOCATIONS')}"         
+                                         process="@form"
+                                         ajax="false"/>
+                    </p:outputPanel>
+
                 </h:form>
             </p:outputPanel>
 

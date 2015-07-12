@@ -23,12 +23,16 @@
                           value="Organisation des bénévoles"/>
             <h:form id="toolsForm" rendered="#{authController.adminAuthenticated}">
                 <p:menuButton value="Outils">
+                    <p:menuitem outcome="/tools/preferences"
+                                value="Préférences"/>
                     <p:menuitem outcome="/tools/locations"
                                 value="Emplacements"/>
                     <p:menuitem outcome="/tools/campaigndates"
                                 value="Dates de campagne"/>
                     <p:menuitem outcome="/tools/users"
                                 value="Utilisateurs"/>
+                    <p:menuitem outcome="/tools/schedule"
+                                value="Programme"/>
                 </p:menuButton>
             </h:form>
             <nav id="mainNav">
@@ -38,8 +42,8 @@
                 <h:link outcome="/user/register"
                         rendered="#{not authController.userAuthenticated}"
                         value="Créer un compte"/>
-                <h:link outcome="/user/register_availablility"
-                        rendered="#{authController.userAuthenticated and not userSessionController.hasAvailabilities}"
+                <h:link outcome="/user/availability_register"
+                        rendered="#{authController.userAuthenticated and not userSessionController.hasAvailabilities and not globalPreferencesController.registrationClosed}"
                         value="Enregistrer ses disponibilités"/>
                 <h:link outcome="/user/availabilities"
                         rendered="#{authController.userAuthenticated and userSessionController.hasAvailabilities}"

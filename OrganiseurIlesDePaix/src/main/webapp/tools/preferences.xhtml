@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            Édition des préférences
+        </ui:define>
+        <ui:define name="body">
+            <h:form>
+                <h4>Personne de contact</h4>
+                <h:panelGrid columns="2" styleClass="formTable">
+                    <p:outputLabel value="Nom:"/>
+                    <p:inputText value="#{editPreferencesController.contactName}"/>
+                    <p:outputLabel value="E-mail:"/>
+                    <p:inputText value="#{editPreferencesController.contactMail}"/>
+                    <p:outputLabel value="Telephone 1:"/>
+                    <p:inputText value="#{editPreferencesController.contactPhone1}"/>
+                    <p:outputLabel value="Telephone 2:"/>
+                    <p:inputText value="#{editPreferencesController.contactPhone2}"/>
+                </h:panelGrid>
+                <p:commandButton value="Enregistrer"
+                                 action="#{editPreferencesController.actionSaveContact()}"
+                                 update="@form"/>
+                <br/>
+                <h4>État de l'enregistrement des disponibilités</h4>
+                <p:outputPanel rendered="#{globalPreferencesController.registrationClosed}">
+                    Les bénévoles ne peuvent plus modifier leurs disponibilités. 
+                    <p:commandLink value="Autoriser à nouveau"
+                                   action="#{editPreferencesController.actionSetRegistrationClosed(false)}"
+                                   update="@form"/>
+                </p:outputPanel>
+                <p:outputPanel rendered="#{not globalPreferencesController.registrationClosed}">
+                    Les bénévoles peuvent modifier leurs disponibilités. 
+                    <p:commandLink value="Clôturer"
+                                   action="#{editPreferencesController.actionSetRegistrationClosed(true)}"
+                                   update="@form"/>
+                </p:outputPanel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

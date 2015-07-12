@@ -58,4 +58,10 @@ public class DateUtils {
         Date newDate = calendar.getTime();
         return newDate;
     }
+    
+    public static Long timeDiff(Date fromDate, Date toDate) {
+        long time2 = toDate.getTime();
+        long time1 = fromDate.getTime();
+        return time2 - time1;
+    }
 }

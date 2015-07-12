@@ -110,10 +110,51 @@ td.locationsRightCol {
     float: left;
 }
 
-.availabilityDatesListItem {
+div.availabilityDatesListItem {
     padding: 1em;
 }
-.availabilityDatesListItem .date {
+div.availabilityDatesListItem .date {
     font-weight: bolder;
     display: block;
+}
+div.availabilityDatesListItem td {
+    padding: 0;
+}
+
+table.registerAvailabilitiesStep1Table {
+    display: inline-block;
+}
+table.registerAvailabilitiesStep1Table > tbody >  tr > td {
+    max-width: 400px;
+    margin-left: 1em;
+    margin-right: 1em;
+    padding: 1em;
+    vertical-align: top;
+}
+
+.infoTip {
+    margin: 0.5em;
+}
+.infoTip.warning {
+    background-color: beige;
+}
+.infoTip p {
+    font-weight: lighter;
+    font-size: 0.95em;
+    padding: 0.2em;
+    margin: 0;
+}
+
+table.formTable {
+    display: block;
+}
+table.formTable > tbody{
+    display: inline-block;
+}
+table.formTable > tbody > tr > td {
+    text-align: left;
+}
+table.formTable > tbody > tr > td:first-child {
+    text-align: right;
+    padding-right: 0.2em;
 }

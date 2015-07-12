@@ -1,0 +1,191 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            Agenda
+        </ui:define>
+        <ui:define name="body">
+            <h:form id="registrationsForm">
+                <p:outputPanel styleClass="infoTip warning"
+                               rendered="#{not globalPreferencesController.registrationClosed}">
+                    <p>
+                        Les inscriptions ne sont pas encore clôturées. Il est recommandé de le faire
+                        avant de générer le programme.
+                    </p>
+                    <p:commandLink value="Clôturer les inscriptions"
+                                   action="#{scheduleController.actionCloseRegistrations()}"
+                                   update="@form"/>
+                </p:outputPanel>
+            </h:form>
+
+            <h:form rendered="#{not scheduleController.hasSchedule()}">
+                <p:outputPanel id="generatePanel">
+                    <h2>Générer le programme</h2>
+                    <p:outputPanel styleClass="infoTip">
+                        <p>
+                            Les disponibilités de #{scheduleController.usersAmount} utilisateur(s) seront
+                            réparties entre les #{scheduleController.locationsAmount} emplacement(s) pour
+                            chacun des #{scheduleController.campaignDayAmount} jour(s) de campagne.
+                        </p>
+                    </p:outputPanel>
+                    <p:commandButton value="Générer"
+                                     action="#{scheduleController.actionGenerate()}"
+                                     rendered="#{not scheduleController.solverRunning}"
+                                     onstart="PF('generateBlockUi').show();"
+                                     process="@this"
+                                     update="pollPanel"/>
+                </p:outputPanel>
+                <p:blockUI block="generatePanel"
+                           widgetVar="generateBlockUi"/>
+                <p:outputPanel id="pollPanel">
+                    <p:outputPanel styleClass="infoTip"
+                                   rendered="#{scheduleController.solverRunning}">
+                        <p>Veuillez patienter...</p>
+                    </p:outputPanel>
+                    <p:poll rendered="#{scheduleController.solverRunning and not scheduleController.solverDone}"
+                            listener="#{scheduleController.actionCheckDone()}"
+                            interval="2"
+                            stop="#{scheduleController.solverDone}"
+                            update=":doneForm"/>
+                </p:outputPanel>
+            </h:form>
+            <h:form id="doneForm">
+                <p:remoteCommand rendered="#{scheduleController.solverRunning and scheduleController.solverDone}"
+                                 actionListener="#{scheduleController.actionStopSolver()}"
+                                 autoRun="true"
+                                 process="@this"
+                                 update="@all"/>
+            </h:form>
+
+            <h:form rendered="#{scheduleController.hasSchedule()}">
+                <p:outputPanel id="validationPanel">
+                    <p:outputPanel styleClass="infoTip warning"
+                                   rendered="#{not globalPreferencesController.scheduleOnline}">
+                        <p>
+                            Le programme n'est pas encore validé.
+                            <br/>
+                            <p:commandLink action="#{scheduleController.actionPublishSchedule()}"
+                                           value="Valider le programme"
+                                           update="validationPanel"/>
+                            <br />
+                            <p:commandLink value="Annuler le programme"
+                                           action="#{scheduleController.actionDeleteSchedule()}"
+                                           ajax="false">
+                                <p:confirm header="Confirmation" message="Voulez-vous vraiment supprimer le programme?" icon="ui-icon-alert" />
+                            </p:commandLink>
+                        </p>
+                        <p:confirmDialog global="true" >
+                            <p:commandButton value="Oui" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                            <p:commandButton value="Non" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                        </p:confirmDialog>
+                    </p:outputPanel>
+                    <p:outputPanel styleClass="infoTip"
+                                   rendered="#{globalPreferencesController.scheduleOnline}">
+                        <p>
+                            Le programme a été validé pour les bénévoles.
+                            <p:commandLink action="#{scheduleController.actionUnPublishSchedule()}"
+                                           value="Annuler la validation"
+                                           update="validationPanel"/>
+                        </p>
+
+                    </p:outputPanel>
+                </p:outputPanel>
+
+
+
+                <p:outputPanel id="calendar">
+                    <table>
+                        <tr>
+                            <ui:repeat value="#{scheduleController.allLocations}"
+                                       var="location">
+                                <th>
+                                    #{location.name}
+                                    <div style="font-size: smaller; font-weight: lighter;">
+                                        #{location.requriedPersonAmount} personne(s) requises.
+                                    </div>
+                                </th>
+                            </ui:repeat>
+                        </tr>
+                        <ui:repeat value="#{scheduleController.allCampaignDays}"
+                                   var="campaignDay">
+                            <tr>
+                                <ui:repeat value="#{scheduleController.allLocations}"
+                                           var="location">
+                                    <td>
+                                        <p:outputPanel style="height: 400px; width: 220px; display: inline-block;">
+
+                                            <p:schedule allDaySlot="false"
+                                                        clientTimeZone="Europe/Brussels"
+                                                        initialDate="#{campaignDay.date}"
+                                                        showHeader="false"
+                                                        timeFormat="HH:mm"
+                                                        timeZone="Europe/Brussels"
+                                                        locale="fr_BE"
+                                                        view="agendaDay"
+                                                        maxTime="21:00"
+                                                        minTime="7:00"
+                                                        aspectRatio="0.5"
+                                                        slotDuration="01:00:00"
+                                                        columnFormat="dddd DD/MM/YYYY"
+                                                        axisFormat="HH:mm"
+                                                        style="height: 420px; overflow: hidden;"
+                                                        value="#{scheduleController.getScheduleModel(location, campaignDay)}">
+                                                <p:ajax event="eventSelect" listener="#{scheduleController.onEventSelect}" update="@form:eventDetails" oncomplete="PF('eventDialog').show();" />
+                                                <p:ajax event="eventMove" listener="#{scheduleController.onEventMove}" />
+                                                <p:ajax event="eventResize" listener="#{scheduleController.onEventResize}" />
+                                            </p:schedule>
+                                        </p:outputPanel>
+                                    </td>
+                                </ui:repeat>
+                            </tr>
+                        </ui:repeat>
+                    </table>
+                </p:outputPanel>
+
+                <p:dialog widgetVar="eventDialog" header="Détails">
+                    <p:outputPanel id="eventDetails">
+                        <h:panelGrid  columns="2" rendered="#{not empty scheduleController.editingEvent}"
+                                      styleClass="formTable">
+                            <h:outputLabel value="Date:" />
+                            <p:selectOneMenu value="#{scheduleController.editingEvent.campaignDay}" converter="omnifaces.SelectItemsConverter">
+                                <f:selectItems value="#{scheduleController.allCampaignDays}"
+                                               var="day" itemValue="#{day}"
+                                               itemLabel="#{scheduleController.getCampaignDayLabel(day)}"/>
+                            </p:selectOneMenu>
+                            <h:outputLabel value="Emplacement:" />
+                            <p:selectOneMenu value="#{scheduleController.editingEvent.location}" converter="omnifaces.SelectItemsConverter">
+                                <f:selectItems value="#{scheduleController.allLocations}"
+                                               var="loc" itemValue="#{loc}"
+                                               itemLabel="#{loc.name}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="from" value="De:" />
+                            <p:inputMask id="from" value="#{scheduleController.editingEvent.startTime}" mask="99:99">
+                                <f:convertDateTime pattern="HH:mm" timeZone="Europe/Brussels"/>
+                            </p:inputMask>
+                            <h:outputLabel for="to" value="À:" />
+                            <p:inputMask id="to" value="#{scheduleController.editingEvent.endTime}" mask="99:99">
+                                <f:convertDateTime pattern="HH:mm" timeZone="Europe/Brussels"/>
+                            </p:inputMask>
+                            <h:outputLabel for="person" value="Nombre de personnes:" />
+                            <h:outputText value="#{scheduleController.editingEvent.personAmount}"/>
+
+
+                            <p:commandButton id="addButton" value="Enregistrer"
+                                             actionListener="#{scheduleController.actionSaveEvent()}" 
+                                             oncomplete="PF('eventDialog').hide();" 
+                                             update="calendar"/>
+                        </h:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>    
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

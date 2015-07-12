@@ -6,7 +6,7 @@
 package com.cghislai.organiseurilesdepaix.view.control;
 
 import com.cghislai.organiseurilesdepaix.domain.CampaignDay;
-import com.cghislai.organiseurilesdepaix.domain.Availabilitiy;
+import com.cghislai.organiseurilesdepaix.domain.Availability;
 import com.cghislai.organiseurilesdepaix.domain.Location;
 import com.cghislai.organiseurilesdepaix.domain.User;
 import com.cghislai.organiseurilesdepaix.domain.util.DayTimeAvailability;
@@ -101,7 +101,7 @@ public class RegisterAvailabilityController implements Serializable {
                 Date endDate = dayTimeAvailability.getEndTime();
                 startDate = DateUtils.timeOnly(startDate);
                 endDate = DateUtils.timeOnly(endDate);
-                Availabilitiy disponibility = new Availabilitiy();
+                Availability disponibility = new Availability();
                 disponibility.setCampaignDay(dayTimeAvailability.getCampaignDay());
                 disponibility.setEndTime(endDate);
                 disponibility.setLocation(location);

@@ -5,13 +5,13 @@
  */
 package com.cghislai.organiseurilesdepaix.service;
 
-import com.cghislai.organiseurilesdepaix.domain.Availability;
-import com.cghislai.organiseurilesdepaix.domain.Availability_;
+import com.cghislai.organiseurilesdepaix.domain.CampaignEvent;
+import com.cghislai.organiseurilesdepaix.domain.CampaignEvent_;
 import com.cghislai.organiseurilesdepaix.domain.CampaignDay;
 import com.cghislai.organiseurilesdepaix.domain.Location;
 import com.cghislai.organiseurilesdepaix.domain.User;
 import com.cghislai.organiseurilesdepaix.domain.util.Pagination;
-import com.cghislai.organiseurilesdepaix.service.search.AvailabilitySearch;
+import com.cghislai.organiseurilesdepaix.service.search.CampaignEventSearch;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,8 +19,10 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
@@ -32,44 +34,54 @@ import javax.persistence.criteria.Root;
  * @author cghislai
  */
 @Stateless
-public class AvailabilityService implements Serializable {
+public class CampaignEventService implements Serializable {
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<Availability> findAvailabilities(AvailabilitySearch availabilitySearch) {
+    public List<CampaignEvent> findCampaignEvents(CampaignEventSearch campaignEventSearch) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Availability> query = builder.createQuery(Availability.class);
-        Root<Availability> root = query.from(Availability.class);
+        CriteriaQuery<CampaignEvent> query = builder.createQuery(CampaignEvent.class);
+        Root<CampaignEvent> root = query.from(CampaignEvent.class);
 
-        List<Predicate> predicates = applyAvailabilitySearch(availabilitySearch, root, builder);
+        List<Predicate> predicates = applyCampaignEventSearch(campaignEventSearch, root, builder);
 
         query.select(root);
         query.where(predicates.toArray(new Predicate[0]));
 
-        TypedQuery<Availability> typedQuery = entityManager.createQuery(query);
-        Pagination pagination = availabilitySearch.getPagination();
+        TypedQuery<CampaignEvent> typedQuery = entityManager.createQuery(query);
+        Pagination pagination = campaignEventSearch.getPagination();
         if (pagination != null) {
             typedQuery.setFirstResult(pagination.getFirstIndex());
             typedQuery.setMaxResults(pagination.getPageSize());
         }
         return typedQuery.getResultList();
     }
+    public void deleteAllCampaignEvents() {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaDelete<CampaignEvent> delete = builder.createCriteriaDelete(CampaignEvent.class);
+        
+        Root<CampaignEvent> root = delete.from(CampaignEvent.class);
+        
 
-    public List<CampaignDay> findAvailabilitiesDays(AvailabilitySearch availabilitySearch) {
+        Query query = entityManager.createQuery(delete);
+        query.executeUpdate();
+    }
+
+    public List<CampaignDay> findCampaignEventsDays(CampaignEventSearch campaignEventSearch) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CampaignDay> query = builder.createQuery(CampaignDay.class);
-        Root<Availability> root = query.from(Availability.class);
+        Root<CampaignEvent> root = query.from(CampaignEvent.class);
 
-        List<Predicate> predicates = applyAvailabilitySearch(availabilitySearch, root, builder);
+        List<Predicate> predicates = applyCampaignEventSearch(campaignEventSearch, root, builder);
 
-        Path<CampaignDay> campaignDayPath = root.get(Availability_.campaignDay);
+        Path<CampaignDay> campaignDayPath = root.get(CampaignEvent_.campaignDay);
         query.select(campaignDayPath);
         query.distinct(true);
         query.where(predicates.toArray(new Predicate[0]));
 
         TypedQuery<CampaignDay> typedQuery = entityManager.createQuery(query);
-        Pagination pagination = availabilitySearch.getPagination();
+        Pagination pagination = campaignEventSearch.getPagination();
         if (pagination != null) {
             typedQuery.setFirstResult(pagination.getFirstIndex());
             typedQuery.setMaxResults(pagination.getPageSize());
@@ -77,20 +89,20 @@ public class AvailabilityService implements Serializable {
         return typedQuery.getResultList();
     }
 
-    public List<Location> findAvailabilitiesLocations(AvailabilitySearch availabilitySearch) {
+    public List<Location> findCampaignEventsLocations(CampaignEventSearch campaignEventSearch) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Location> query = builder.createQuery(Location.class);
-        Root<Availability> root = query.from(Availability.class);
+        Root<CampaignEvent> root = query.from(CampaignEvent.class);
 
-        List<Predicate> predicates = applyAvailabilitySearch(availabilitySearch, root, builder);
+        List<Predicate> predicates = applyCampaignEventSearch(campaignEventSearch, root, builder);
 
-        Path<Location> locationPath = root.get(Availability_.location);
+        Path<Location> locationPath = root.get(CampaignEvent_.location);
         query.select(locationPath);
         query.distinct(true);
         query.where(predicates.toArray(new Predicate[0]));
 
         TypedQuery<Location> typedQuery = entityManager.createQuery(query);
-        Pagination pagination = availabilitySearch.getPagination();
+        Pagination pagination = campaignEventSearch.getPagination();
         if (pagination != null) {
             typedQuery.setFirstResult(pagination.getFirstIndex());
             typedQuery.setMaxResults(pagination.getPageSize());
@@ -98,12 +110,12 @@ public class AvailabilityService implements Serializable {
         return typedQuery.getResultList();
     }
 
-    public Long countAvailabilities(AvailabilitySearch availabilitySearch) {
+    public Long countCampaignEvents(CampaignEventSearch campaignEventSearch) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = builder.createQuery(Long.class);
-        Root<Availability> root = query.from(Availability.class);
+        Root<CampaignEvent> root = query.from(CampaignEvent.class);
 
-        List<Predicate> predicates = applyAvailabilitySearch(availabilitySearch, root, builder);
+        List<Predicate> predicates = applyCampaignEventSearch(campaignEventSearch, root, builder);
 
         Expression<Long> count = builder.count(root);
         query.select(count);
@@ -116,9 +128,9 @@ public class AvailabilityService implements Serializable {
     public Long countUsersWithAvailabilites() {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = builder.createQuery(Long.class);
-        Root<Availability> root = query.from(Availability.class);
+        Root<CampaignEvent> root = query.from(CampaignEvent.class);
 
-        Path<User> userPath = root.get(Availability_.user);
+        Path<User> userPath = root.get(CampaignEvent_.user);
         Expression<Long> userCount = builder.countDistinct(userPath);
 
         query.select(userCount);
@@ -128,57 +140,57 @@ public class AvailabilityService implements Serializable {
         return typedQuery.getSingleResult();
     }
 
-    private List<Predicate> applyAvailabilitySearch(AvailabilitySearch availabilitySearch, Root<Availability> root, CriteriaBuilder builder) {
+    private List<Predicate> applyCampaignEventSearch(CampaignEventSearch campaignEventSearch, Root<CampaignEvent> root, CriteriaBuilder builder) {
         List<Predicate> predicates = new ArrayList<>();
-        CampaignDay campaignDay = availabilitySearch.getCampaignDay();
+        CampaignDay campaignDay = campaignEventSearch.getCampaignDay();
         if (campaignDay != null) {
-            Path<CampaignDay> campaignDayPath = root.get(Availability_.campaignDay);
+            Path<CampaignDay> campaignDayPath = root.get(CampaignEvent_.campaignDay);
             Predicate pred = builder.equal(campaignDayPath, campaignDay);
             predicates.add(pred);
         }
-        Date endTime = availabilitySearch.getEndTime();
+        Date endTime = campaignEventSearch.getEndTime();
         if (endTime != null) {
-            Path<Date> endPath = root.get(Availability_.endTime);
+            Path<Date> endPath = root.get(CampaignEvent_.endTime);
             Predicate pred = builder.greaterThan(endPath, endTime);
             predicates.add(pred);
         }
-        Date forTime = availabilitySearch.getForTime();
+        Date forTime = campaignEventSearch.getForTime();
         if (forTime != null) {
-            Path<Date> startTimePath = root.get(Availability_.startTime);
-            Path<Date> endTimePath = root.get(Availability_.endTime);
+            Path<Date> startTimePath = root.get(CampaignEvent_.startTime);
+            Path<Date> endTimePath = root.get(CampaignEvent_.endTime);
             Predicate endGreater = builder.greaterThan(endTimePath, forTime);
             Predicate startSmaller = builder.lessThanOrEqualTo(startTimePath, forTime);
             Predicate pred = builder.and(endGreater, startSmaller);
             predicates.add(pred);
         }
-        Location location = availabilitySearch.getLocation();
+        Location location = campaignEventSearch.getLocation();
         if (location != null) {
-            Path<Location> locationPath = root.get(Availability_.location);
+            Path<Location> locationPath = root.get(CampaignEvent_.location);
             Predicate pred = builder.equal(locationPath, location);
             predicates.add(pred);
         }
-        Date startTime = availabilitySearch.getStartTime();
+        Date startTime = campaignEventSearch.getStartTime();
         if (startTime != null) {
-            Path<Date> startTimePath = root.get(Availability_.startTime);
+            Path<Date> startTimePath = root.get(CampaignEvent_.startTime);
             Predicate pred = builder.lessThanOrEqualTo(startTimePath, startTime);
             predicates.add(pred);
         }
-        User user = availabilitySearch.getUser();
+        User user = campaignEventSearch.getUser();
         if (user != null) {
-            Path<User> userPath = root.get(Availability_.user);
+            Path<User> userPath = root.get(CampaignEvent_.user);
             Predicate pred = builder.equal(userPath, user);
             predicates.add(pred);
         }
         return predicates;
     }
 
-    public Availability saveAvailability(Availability availabilitiy) {
-        Availability managedAvailability = entityManager.merge(availabilitiy);
-        return managedAvailability;
+    public CampaignEvent saveCampaignEvent(CampaignEvent campaignEvent) {
+        CampaignEvent managedCampaignEvent = entityManager.merge(campaignEvent);
+        return managedCampaignEvent;
     }
 
-    public void removeAvailability(Availability availabilitiy) {
-        Availability managedAvailability = entityManager.merge(availabilitiy);
-        entityManager.remove(managedAvailability);
+    public void removeCampaignEvent(CampaignEvent campaignEvent) {
+        CampaignEvent managedCampaignEvent = entityManager.merge(campaignEvent);
+        entityManager.remove(managedCampaignEvent);
     }
 }

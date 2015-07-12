@@ -2,13 +2,23 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
     <ui:composition template="/template.xhtml">
         <ui:define name="title">
-            Test titre
+            Organisation des bénévoles
         </ui:define>
         <ui:define name="body">
-            Hello world
+            <h:form>
+                <p:outputPanel rendered="#{globalPreferencesController.registrationClosed}"
+                               styleClass="infoTip">
+                    L'enregistrement des disponibilités est cloturé.
+                </p:outputPanel>
+                <p:outputPanel rendered="#{globalPreferencesController.scheduleOnline}"
+                               styleClass="infoTip">
+                    Le programme est disponible.
+                </p:outputPanel>
+            </h:form>
         </ui:define>
     </ui:composition>
 </html>

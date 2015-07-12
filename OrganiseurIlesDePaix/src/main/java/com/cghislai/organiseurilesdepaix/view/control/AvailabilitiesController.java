@@ -5,7 +5,7 @@
  */
 package com.cghislai.organiseurilesdepaix.view.control;
 
-import com.cghislai.organiseurilesdepaix.domain.Availabilitiy;
+import com.cghislai.organiseurilesdepaix.domain.Availability;
 import com.cghislai.organiseurilesdepaix.domain.CampaignDay;
 import com.cghislai.organiseurilesdepaix.domain.Location;
 import com.cghislai.organiseurilesdepaix.domain.User;
@@ -41,6 +41,8 @@ public class AvailabilitiesController implements Serializable {
 
     @Inject
     private AuthController authController;
+    @Inject
+    private GlobalPreferencesController globalPreferencesController;
     @EJB
     private AvailabilityService availabilityService;
     @EJB
@@ -50,7 +52,7 @@ public class AvailabilitiesController implements Serializable {
     private List<Location> locations;
     // Schedule models location x days
     private ScheduleModel[][] models;
-    private Availabilitiy editingAvailability;
+    private Availability editingAvailability;
 
     @PostConstruct
     public void init() {
@@ -82,7 +84,7 @@ public class AvailabilitiesController implements Serializable {
     public void onEventMove(ScheduleEntryMoveEvent event) {
         int minuteDelta = event.getMinuteDelta();
         MyScheduleEvent scheduleEvent = (MyScheduleEvent) event.getScheduleEvent();
-        Availabilitiy availabilitiy = scheduleEvent.getAvailabilitiy();
+        Availability availabilitiy = scheduleEvent.getAvailabilitiy();
         Date startTime = availabilitiy.getStartTime();
         Date newStartTime = DateUtils.addMinutes(startTime, minuteDelta);
         availabilitiy.setStartTime(newStartTime);
@@ -90,24 +92,24 @@ public class AvailabilitiesController implements Serializable {
         Date newEndTime = DateUtils.addMinutes(endTime, minuteDelta);
         availabilitiy.setEndTime(newEndTime);
 
-        Availabilitiy newAvailabilitiy = availabilityService.saveAvailability(availabilitiy);
+        Availability newAvailabilitiy = availabilityService.saveAvailability(availabilitiy);
         scheduleEvent.setAvailabilitiy(newAvailabilitiy);
     }
 
     public void onEventResize(ScheduleEntryResizeEvent event) {
         int minuteDelta = event.getMinuteDelta();
         MyScheduleEvent scheduleEvent = (MyScheduleEvent) event.getScheduleEvent();
-        Availabilitiy availabilitiy = scheduleEvent.getAvailabilitiy();
+        Availability availabilitiy = scheduleEvent.getAvailabilitiy();
         Date endTime = availabilitiy.getEndTime();
         Date newEndTime = DateUtils.addMinutes(endTime, minuteDelta);
         availabilitiy.setEndTime(newEndTime);
 
-        Availabilitiy newAvailabilitiy = availabilityService.saveAvailability(availabilitiy);
+        Availability newAvailabilitiy = availabilityService.saveAvailability(availabilitiy);
         scheduleEvent.setAvailabilitiy(newAvailabilitiy);
     }
     
     public void actionNewEvent(CampaignDay campaignDay, Location location) {
-        editingAvailability = new Availabilitiy();
+        editingAvailability = new Availability();
         User authenticatedUser = authController.getAuthenticatedUser();
         editingAvailability.setCampaignDay(campaignDay);
         editingAvailability.setLocation(location);
@@ -120,7 +122,7 @@ public class AvailabilitiesController implements Serializable {
         editingAvailability = null;
     }
     public void saveEvent() {
-        Availabilitiy savedAvailability = availabilityService.saveAvailability(editingAvailability);
+        Availability savedAvailability = availabilityService.saveAvailability(editingAvailability);
         editingAvailability = null;
     }
 
@@ -132,7 +134,7 @@ public class AvailabilitiesController implements Serializable {
         return locations;
     }
 
-    public Availabilitiy getEditingAvailability() {
+    public Availability getEditingAvailability() {
         return editingAvailability;
     }
 
@@ -154,8 +156,8 @@ public class AvailabilitiesController implements Serializable {
 
         @Override
         public void loadEvents(Date start, Date end) {
-            List<Availabilitiy> availabilities = availabilityService.findAvailabilities(availabilitySearch);
-            for (Availabilitiy availabilitiy : availabilities) {
+            List<Availability> availabilities = availabilityService.findAvailabilities(availabilitySearch);
+            for (Availability availabilitiy : availabilities) {
                 MyScheduleEvent event = new MyScheduleEvent(availabilitiy);
                 addEvent(event);
             }
@@ -165,9 +167,9 @@ public class AvailabilitiesController implements Serializable {
 
     private class MyScheduleEvent extends DefaultScheduleEvent {
 
-        private Availabilitiy availabilitiy;
+        private Availability availabilitiy;
 
-        public MyScheduleEvent(Availabilitiy availabilitiy) {
+        public MyScheduleEvent(Availability availabilitiy) {
             this.availabilitiy = availabilitiy;
             setData(availabilitiy);
             setTitle(availabilitiy.getPersonAmount() + " personne(s)");
@@ -179,14 +181,15 @@ public class AvailabilitiesController implements Serializable {
             Date endTime = availabilitiy.getEndTime();
             Date endDate = DateUtils.timeAndDay(endTime, campaignDate);
             setEndDate(endDate);
-            setEditable(true);
+            final Boolean registrationClosed = globalPreferencesController.getRegistrationClosed();
+            setEditable(registrationClosed == null || registrationClosed == false);
         }
 
-        public Availabilitiy getAvailabilitiy() {
+        public Availability getAvailabilitiy() {
             return availabilitiy;
         }
 
-        public void setAvailabilitiy(Availabilitiy availabilitiy) {
+        public void setAvailabilitiy(Availability availabilitiy) {
             this.availabilitiy = availabilitiy;
         }
 

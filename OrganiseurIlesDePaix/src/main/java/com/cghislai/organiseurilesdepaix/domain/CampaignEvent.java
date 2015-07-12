@@ -23,8 +23,8 @@ import javax.persistence.TemporalType;
  * @author cghislai
  */
 @Entity
-@Table(name="availability")
-public class Availabilitiy implements Serializable{
+@Table(name = "campaign_event")
+public class CampaignEvent implements Serializable {
 
     @Id
     @GeneratedValue
@@ -63,6 +63,14 @@ public class Availabilitiy implements Serializable{
         this.user = user;
     }
 
+    public CampaignDay getCampaignDay() {
+        return campaignDay;
+    }
+
+    public void setCampaignDay(CampaignDay campaignDay) {
+        this.campaignDay = campaignDay;
+    }
+
     public Location getLocation() {
         return location;
     }
@@ -71,12 +79,12 @@ public class Availabilitiy implements Serializable{
         this.location = location;
     }
 
-    public CampaignDay getCampaignDay() {
-        return campaignDay;
+    public Integer getPersonAmount() {
+        return personAmount;
     }
 
-    public void setCampaignDay(CampaignDay campaignDay) {
-        this.campaignDay = campaignDay;
+    public void setPersonAmount(Integer personAmount) {
+        this.personAmount = personAmount;
     }
 
     public Date getStartTime() {
@@ -95,18 +103,10 @@ public class Availabilitiy implements Serializable{
         this.endTime = endTime;
     }
 
-    public Integer getPersonAmount() {
-        return personAmount;
-    }
-
-    public void setPersonAmount(Integer personAmount) {
-        this.personAmount = personAmount;
-    }
-
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.id);
+        hash = 37 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
@@ -118,7 +118,7 @@ public class Availabilitiy implements Serializable{
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Availabilitiy other = (Availabilitiy) obj;
+        final CampaignEvent other = (CampaignEvent) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }

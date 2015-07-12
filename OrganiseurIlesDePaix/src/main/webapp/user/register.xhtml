@@ -15,7 +15,8 @@
                 <p:messages />
                 <p:focus/>
                 <h:panelGrid columns="2"
-                             style="text-align: center; margin: 1em;">
+                             styleClass="formTable"
+                             style="margin: 1em;">
                     <h:outputLabel value="Nom:"/>
                     <p:inputText value="#{userRegisterController.humanName}"
                                  id="nom"
@@ -64,6 +65,7 @@
                 <p:commandButton value="Enregistrer"
                                  update="@form"
                                  action="#{userRegisterController.actionRegister()}"/>
+                <br/>
                 <p:commandLink value="Annuler"
                                immediate="true"
                                action="/index.jsf"/>

@@ -5,8 +5,8 @@
  */
 package com.cghislai.organiseurilesdepaix.view.control;
 
-import com.cghislai.organiseurilesdepaix.domain.CampaignDay;
 import com.cghislai.organiseurilesdepaix.domain.Availability;
+import com.cghislai.organiseurilesdepaix.domain.CampaignDay;
 import com.cghislai.organiseurilesdepaix.domain.Location;
 import com.cghislai.organiseurilesdepaix.domain.User;
 import com.cghislai.organiseurilesdepaix.domain.util.DayTimeAvailability;
@@ -20,17 +20,14 @@ import com.cghislai.organiseurilesdepaix.util.MyLazyDataModel;
 import com.cghislai.organiseurilesdepaix.view.Views;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.faces.view.ViewScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.event.map.OverlaySelectEvent;
@@ -45,13 +42,13 @@ import org.primefaces.model.map.Marker;
  * @author cghislai
  */
 @Named
-@ViewScoped
-public class RegisterAvailabilityController implements Serializable {
+@SessionScoped
+public class RegisterAvailabilitiesController implements Serializable {
 
     @EJB
-    private LocationService locationService;
-    @EJB
     private CampaignDatesService campaignDatesService;
+    @EJB
+    private LocationService locationService;
     @EJB
     private AvailabilityService availabilityService;
     @Inject
@@ -59,44 +56,57 @@ public class RegisterAvailabilityController implements Serializable {
     @Inject
     private UserSessionController userSessionController;
 
-    private Step currentStep;
-    // Step 1
-    private List<CampaignDay> allDates;
-    private Map<CampaignDay, DayTimeAvailability> datesAvailabilities;
-    private Integer personAmount;
-    // Step 2
+    private List<DayTimeAvailability> dayTimeAvailabilities;
+    private Long personAmount;
     private LocationSearch locationSearch;
     private List<Location> selectedLocations;
     private LazyDataModel<Location> locationsModel;
     private MapModel googleMapModel;
 
-    public enum Step {
-
-        SELECT_DATES,
-        SELECT_LOCATIONS;
+    public RegisterAvailabilitiesController() {
     }
 
     @PostConstruct
     public void init() {
-        currentStep = Step.SELECT_DATES;
-        datesAvailabilities = new HashMap<>();
-        personAmount = 1;
-        searchAllCampaignDates();
-        // Step 2
+        personAmount = 1L;
+        List<CampaignDay> allDates = campaignDatesService.findAllDays();
+        dayTimeAvailabilities = allDates.stream()
+                .map((CampaignDay campaignDay) -> {
+                    DayTimeAvailability availability = new DayTimeAvailability();
+                    availability.setSelected(false);
+                    availability.setCampaignDay(campaignDay);
+                    Date date = availability.getCampaignDay().getDate();
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(date);
+                    calendar.set(Calendar.HOUR_OF_DAY, 8);
+                    Date startTime = calendar.getTime();
+                    calendar.set(Calendar.HOUR_OF_DAY, 18);
+                    Date endTime = calendar.getTime();
+                    availability.setStartTime(startTime);
+                    availability.setEndTime(endTime);
+                    return availability;
+                })
+                .collect(Collectors.toList());
         locationSearch = new LocationSearch();
         selectedLocations = new ArrayList<>();
         googleMapModel = new DefaultMapModel();
-        searchLocations();
     }
 
-    public void actionSwitchToStep(Step step) {
-        currentStep = step;
+    public boolean isAnyDateSelected() {
+        return dayTimeAvailabilities.stream()
+                .filter(availability -> availability.getSelected())
+                .findAny()
+                .isPresent();
     }
 
-    public String actionFinish() {
+    public boolean isAnyLocationSelected() {
+        return selectedLocations.size() > 0;
+    }
+
+    public String actionRegister() {
         User authenticatedUser = authController.getAuthenticatedUser();
-        for (DayTimeAvailability dayTimeAvailability : datesAvailabilities.values()) {
-            for (Location location : selectedLocations) {
+        for (DayTimeAvailability dayTimeAvailability : dayTimeAvailabilities) {
+            selectedLocations.stream().map((location) -> {
                 Date startDate = dayTimeAvailability.getStartTime();
                 Date endDate = dayTimeAvailability.getEndTime();
                 startDate = DateUtils.timeOnly(startDate);
@@ -105,36 +115,55 @@ public class RegisterAvailabilityController implements Serializable {
                 disponibility.setCampaignDay(dayTimeAvailability.getCampaignDay());
                 disponibility.setEndTime(endDate);
                 disponibility.setLocation(location);
-                disponibility.setPersonAmount(personAmount);
+                disponibility.setPersonAmount(personAmount.intValue());
                 disponibility.setStartTime(startDate);
                 disponibility.setUser(authenticatedUser);
+                return disponibility;
+            }).forEach((disponibility) -> {
                 availabilityService.saveAvailability(disponibility);
-            }
+            });
         }
         userSessionController.updateAvailabilities();
         return Views.USER_AVAILABILITIES;
     }
 
-    public void actionSelectDate(CampaignDay campaignDay) {
-        DayTimeAvailability availability = new DayTimeAvailability();
-        availability.setCampaignDay(campaignDay);
-        datesAvailabilities.put(campaignDay, availability);
+    public String actionShow() {
+        return actionShowPerson();
     }
 
-    public void actionUnselectDate(CampaignDay campaignDay) {
-        datesAvailabilities.remove(campaignDay);
+    public String actionShowPerson() {
+        return Views.USER_REGISTER_AVAILABILITY_PERSON;
     }
 
-    public boolean isDateSelected(CampaignDay campaignDay) {
-        return datesAvailabilities.containsKey(campaignDay);
+    public String actionShowDates() {
+        return Views.USER_REGISTER_AVAILABILITY_DATES;
     }
 
-    public DayTimeAvailability getTimeAvailability(CampaignDay campaignDay) {
-        return datesAvailabilities.get(campaignDay);
+    public String actionShowLocations() {
+        searchLocations();
+        return Views.USER_REGISTER_AVAILABILITY_LOCATION;
+    }
+
+    public List<DayTimeAvailability> getDayTimeAvailabilities() {
+        return dayTimeAvailabilities;
+    }
+
+    public Long getPersonAmount() {
+        return personAmount;
+    }
+
+    public void setPersonAmount(Long personAmount) {
+        this.personAmount = personAmount;
     }
 
     public void actionSearchLocations() {
         searchLocations();
+    }
+
+    private void searchLocations() {
+        checkLocationSearch();
+        locationsModel = new LocationModel();
+        updateMarkers();
     }
 
     public void actionSelectLocation(Location location) {
@@ -151,23 +180,6 @@ public class RegisterAvailabilityController implements Serializable {
         return selectedLocations.contains(location);
     }
 
-    public String getDateLabel(CampaignDay campaignDay) {
-        DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy");
-        String formatted = dateFormat.format(campaignDay.getDate());
-        return formatted;
-    }
-
-    public void onMarkerSelect(OverlaySelectEvent event) {
-        Marker marker = (Marker) event.getOverlay();
-        Location location = (Location) marker.getData();
-        boolean selected = isLocationSelected(location);
-        if (selected) {
-            actionUnselectLocation(location);
-        } else {
-            actionSelectLocation(location);
-        }
-    }
-
     public LocationSearch getLocationSearch() {
         return locationSearch;
     }
@@ -178,33 +190,6 @@ public class RegisterAvailabilityController implements Serializable {
 
     public MapModel getGoogleMapModel() {
         return googleMapModel;
-    }
-
-    public Step getCurrentStep() {
-        return currentStep;
-    }
-
-    public List<CampaignDay> getAllDates() {
-        return allDates;
-    }
-
-    public Integer getPersonAmount() {
-        return personAmount;
-    }
-
-    public void setPersonAmount(Integer personAmount) {
-        this.personAmount = personAmount;
-    }
-    
-
-    private void searchLocations() {
-        checkLocationSearch();
-        locationsModel = new LocationModel();
-        updateMarkers();
-    }
-
-    private void searchAllCampaignDates() {
-        allDates = campaignDatesService.findAllDays();
     }
 
     private void updateMarkers() {
@@ -227,6 +212,17 @@ public class RegisterAvailabilityController implements Serializable {
                 marker.setIcon("https://maps.google.com/mapfiles/kml/paddle/wht-circle.png");
             }
             googleMapModel.addOverlay(marker);
+        }
+    }
+
+    public void onMarkerSelect(OverlaySelectEvent event) {
+        Marker marker = (Marker) event.getOverlay();
+        Location location = (Location) marker.getData();
+        boolean selected = isLocationSelected(location);
+        if (selected) {
+            actionUnselectLocation(location);
+        } else {
+            actionSelectLocation(location);
         }
     }
 

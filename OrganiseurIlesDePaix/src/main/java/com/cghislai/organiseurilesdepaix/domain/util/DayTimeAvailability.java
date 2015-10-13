@@ -15,6 +15,7 @@ import java.util.Date;
 public class DayTimeAvailability {
 
     private CampaignDay campaignDay;
+    private Boolean selected;
     private Date startTime;
     private Date endTime;
 
@@ -40,6 +41,14 @@ public class DayTimeAvailability {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public Boolean getSelected() {
+        return selected;
+    }
+
+    public void setSelected(Boolean selected) {
+        this.selected = selected;
     }
 
 }

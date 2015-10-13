@@ -24,12 +24,6 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="1" author="cghislai">
-        <sql>
-            INSERT INTO ouser (USER_NAME, EMAIL, PASSWORD_HASH, IS_ADMIN)
-            VALUES ("admin", "admin@nomail.com", "", TRUE);
-        </sql>
-    </changeSet>
     <changeSet id="2" author="cghislai">
         <addColumn tableName="location">
             <column name="LATITUDE" type="FLOAT(10)" />

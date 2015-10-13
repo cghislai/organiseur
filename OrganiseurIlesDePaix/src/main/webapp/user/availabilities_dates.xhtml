@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:idpcomponents="http://xmlns.jcp.org/jsf/composite/idpcomponents"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            Enregistrer ses disponibilités
+        </ui:define>
+        <ui:define name="body">
+            <h2>Dates</h2>
+            <p:outputPanel styleClass="infoTip">
+                <p>Choisissez les dates et heures pour lesquels vous êtes disponibles. 
+                    Vous pourrez paufiner les horaires plus tard.</p>
+            </p:outputPanel>
+            <h:form styleClass="centerForm">
+                <p:dataList value="#{registerAvailabilitiesController.dayTimeAvailabilities}"
+                            var="dayTimeAvailability"
+                            type="definition">
+                    <idpcomponents:daytimeAvailability value="#{dayTimeAvailability}"
+                                                       id="availability"
+                                                       editable="true">
+                        <p:ajax update=":availabilitiesLinksForm" async="true"/>
+                    </idpcomponents:daytimeAvailability>
+                </p:dataList>
+            </h:form>
+            <h:form id="availabilitiesLinksForm" styleClass="availabilitiesLinksForm">
+                <p:commandButton styleClass="nextButton"
+                                 value="Suivant"
+                                 disabled="#{not registerAvailabilitiesController.isAnyDateSelected()}"
+                                 action="#{registerAvailabilitiesController.actionShowLocations()}"/>
+                <p:commandButton styleClass="prevButton"
+                                 value="Retour"
+                                 action="#{registerAvailabilitiesController.actionShow()}"/>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

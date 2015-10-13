@@ -97,39 +97,10 @@ div.locationListItem p.requiredAmount {
 
 td.locationsLeftCol {
     width: 50%;
+    vertical-align: top;
 }
 td.locationsRightCol {
     width: 50%;
-}
-.availabilityNextButton {
-    display: inline-block;
-    float: right;
-}
-.availabilityPrevButton {
-    display: inline-block;
-    float: left;
-}
-
-div.availabilityDatesListItem {
-    padding: 1em;
-}
-div.availabilityDatesListItem .date {
-    font-weight: bolder;
-    display: block;
-}
-div.availabilityDatesListItem td {
-    padding: 0;
-}
-
-table.registerAvailabilitiesStep1Table {
-    display: inline-block;
-}
-table.registerAvailabilitiesStep1Table > tbody >  tr > td {
-    max-width: 400px;
-    margin-left: 1em;
-    margin-right: 1em;
-    padding: 1em;
-    vertical-align: top;
 }
 
 .infoTip {
@@ -143,6 +114,19 @@ table.registerAvailabilitiesStep1Table > tbody >  tr > td {
     font-size: 0.95em;
     padding: 0.2em;
     margin: 0;
+}
+.availabilitiesLinksForm {
+    width: 50%;
+    padding-left: 25%;
+    padding-right: 25%;
+    padding-top: 1em;
+}
+
+.availabilitiesLinksForm .nextButton {
+    float: right;
+}
+.availabilitiesLinksForm .prevButton {
+    float: left;
 }
 
 table.formTable {
@@ -158,3 +142,20 @@ table.formTable > tbody > tr > td:first-child {
     text-align: right;
     padding-right: 0.2em;
 }
+
+
+
+.dayTimePanel .day ,
+.dayTimePanel .startTime,
+.dayTimePanel .endTime
+{
+    margin: .5em;
+}
+
+.dayTimePanel input,
+.dayTimePanel .ui-chkbox
+{
+    margin-left: .2em;
+    margin-right: .2em;
+}
+

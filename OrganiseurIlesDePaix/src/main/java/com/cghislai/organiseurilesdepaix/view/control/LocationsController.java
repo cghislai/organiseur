@@ -80,6 +80,9 @@ public class LocationsController implements Serializable {
 
     public void actionSeachCoordinates() {
         Float[] coordinates = searchCoordinates(editingLocation);
+        if (coordinates == null) {
+            return;
+        }
         BigDecimal latitude = BigDecimal.valueOf(coordinates[0]);
         BigDecimal longitude = BigDecimal.valueOf(coordinates[1]);
         editingLocation.setLatitude(latitude);

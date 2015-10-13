@@ -46,7 +46,7 @@
                 <p:outputPanel id="pollPanel">
                     <p:outputPanel styleClass="infoTip"
                                    rendered="#{scheduleController.solverRunning}">
-                        <p>Veuillez patienter...</p>
+                        <p>Veuillez patienter... (La résolution peut prendre jusqu'à 5 minutes par date de campagne)</p>
                     </p:outputPanel>
                     <p:poll rendered="#{scheduleController.solverRunning and not scheduleController.solverDone}"
                             listener="#{scheduleController.actionCheckDone()}"

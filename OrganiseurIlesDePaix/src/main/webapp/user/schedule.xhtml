@@ -17,7 +17,7 @@
                             <ui:repeat value="#{userScheduleController.campaignDays}"
                                        var="day">
                                 <th><h:outputText value="#{day.date}">
-                                        <f:convertDateTime pattern="EEEE dd/MM/yyyy" locale="fr_BE"/>
+                                        <f:convertDateTime pattern="EEEE dd/MM/yyyy" locale="fr_BE" timeZone="Europe/Brussels"/>
                                     </h:outputText>
                                 </th>
                             </ui:repeat>

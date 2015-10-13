@@ -22,7 +22,7 @@
                             type="definition">
                     <p:outputPanel styleClass="dayTimePanel" id="dayTimePanel">
                         <h:panelGrid columns="3">
-                            <h:panelGroup styleClass="day">
+                            <h:panelGroup styleClass="day" >
                                 <p:selectBooleanCheckbox id="selectDateCheckBox" value="#{dayTimeAvailability.selected}">
                                     <p:ajax event="change" 
                                             update="dayTimePanel @form:availabilitiesLinksForm" />

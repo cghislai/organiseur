@@ -152,6 +152,13 @@ table.formTable > tbody > tr > td:first-child {
     margin: .5em;
 }
 
+.dayTimePanel table td {
+    text-align: left;
+}
+.dayTimePanel table td:first-child {
+    width: 33%;
+}
+
 .dayTimePanel input,
 .dayTimePanel .ui-chkbox
 {

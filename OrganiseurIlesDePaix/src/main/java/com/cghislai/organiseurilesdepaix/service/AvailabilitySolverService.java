@@ -74,7 +74,8 @@ public class AvailabilitySolverService {
         SolverConfig solverConfig = solverFactory.getSolverConfig();
 
         TerminationConfig terminationConfig = new TerminationConfig();
-        terminationConfig.setSecondsSpentLimit(20L);
+        terminationConfig.setMinutesSpentLimit(3L);
+        terminationConfig.setUnimprovedSecondsSpentLimit(30L);
         solverConfig.setTerminationConfig(terminationConfig);
 
         ScoreDirectorFactoryConfig scoreDirectorFactoryConfig = new ScoreDirectorFactoryConfig();

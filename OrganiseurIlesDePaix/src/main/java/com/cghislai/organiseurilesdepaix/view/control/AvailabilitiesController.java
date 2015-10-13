@@ -77,6 +77,10 @@ public class AvailabilitiesController implements Serializable {
     }
 
     public void onEventSelect(SelectEvent selectEvent) {
+        Boolean registrationClosed = globalPreferencesController.getRegistrationClosed();
+        if (registrationClosed) {
+            return;
+        }
         MyScheduleEvent event = (MyScheduleEvent) selectEvent.getObject();
         editingAvailability = event.getAvailabilitiy();
     }

@@ -16,25 +16,50 @@
                 <p>Choisissez les dates et heures pour lesquels vous êtes disponibles. 
                     Vous pourrez paufiner les horaires plus tard.</p>
             </p:outputPanel>
-            <h:form styleClass="centerForm">
+            <h:form styleClass="centerForm" id="editForm">
                 <p:dataList value="#{registerAvailabilitiesController.dayTimeAvailabilities}"
                             var="dayTimeAvailability"
                             type="definition">
-                    <idpcomponents:daytimeAvailability value="#{dayTimeAvailability}"
-                                                       id="availability"
-                                                       editable="true">
-                        <p:ajax update=":availabilitiesLinksForm" async="true"/>
-                    </idpcomponents:daytimeAvailability>
+                    <p:outputPanel styleClass="dayTimePanel" id="dayTimePanel">
+                        <h:panelGrid columns="3">
+                            <h:panelGroup styleClass="day">
+                                <p:selectBooleanCheckbox id="selectDateCheckBox" value="#{dayTimeAvailability.selected}">
+                                    <p:ajax event="change" 
+                                            update="dayTimePanel @form:availabilitiesLinksForm" />
+                                </p:selectBooleanCheckbox>
+                                <h:outputText value="#{dayTimeAvailability.campaignDay.date}">
+                                    <f:convertDateTime pattern="EEEE dd/MM/yyyy" locale="fr_BE" />
+                                </h:outputText>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="startTime">
+                                <h:outputText value="De"/>
+                                <p:calendar value="#{dayTimeAvailability.startTime}"
+                                            pattern="HH:mm"
+                                            disabled="#{!dayTimeAvailability.selected}"
+                                            timeOnly="true">
+                                </p:calendar>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="endTime">
+                                <h:outputText value="à"/>
+                                <p:calendar value="#{dayTimeAvailability.endTime}"
+                                            disabled="#{!dayTimeAvailability.selected}"
+                                            pattern="HH:mm"
+                                            timeOnly="true">
+                                </p:calendar>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </p:outputPanel>
                 </p:dataList>
-            </h:form>
-            <h:form id="availabilitiesLinksForm" styleClass="availabilitiesLinksForm">
-                <p:commandButton styleClass="nextButton"
-                                 value="Suivant"
-                                 disabled="#{not registerAvailabilitiesController.isAnyDateSelected()}"
-                                 action="#{registerAvailabilitiesController.actionShowLocations()}"/>
-                <p:commandButton styleClass="prevButton"
-                                 value="Retour"
-                                 action="#{registerAvailabilitiesController.actionShow()}"/>
+                <p:outputPanel id="availabilitiesLinksForm" styleClass="availabilitiesLinksForm">
+                    <p:commandButton styleClass="nextButton"
+                                     value="Suivant"
+                                     process=":editForm"
+                                     disabled="#{not registerAvailabilitiesController.isAnyDateSelected()}"
+                                     action="#{registerAvailabilitiesController.actionShowLocations()}"/>
+                    <p:commandButton styleClass="prevButton"
+                                     value="Retour"
+                                     action="#{registerAvailabilitiesController.actionShow()}"/>
+                </p:outputPanel>
             </h:form>
         </ui:define>
     </ui:composition>

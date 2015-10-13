@@ -15,35 +15,6 @@
 
     <!-- IMPLEMENTATION -->
     <cc:implementation>
-        <p:outputPanel styleClass="dayTimePanel">
-            <h:panelGrid columns="3">
-                <h:panelGroup styleClass="day">
-                    <p:selectBooleanCheckbox id="selectDateCheckBox" value="#{cc.attrs.value.selected}"
-                                             disabled="#{!cc.attrs.editable}" >
-                        <p:ajax event="change" process="@this" immediate="true" async="false"
-                            update="#{cc.id}:@parent:@parent" />
-                    </p:selectBooleanCheckbox>
-                    <h:outputText value="#{cc.attrs.value.campaignDay.date}">
-                        <f:convertDateTime pattern="EEEE dd/MM/yyyy" locale="fr_BE" />
-                    </h:outputText>
-                </h:panelGroup>
-                <h:panelGroup styleClass="startTime">
-                    <h:outputText value="De"/>
-                    <p:calendar value="#{cc.attrs.value.startTime}"
-                                pattern="HH:mm"
-                                disabled="#{!cc.attrs.value.selected}"
-                                timeOnly="true">
-                    </p:calendar>
-                </h:panelGroup>
-                <h:panelGroup styleClass="endTime">
-                    <h:outputText value="à"/>
-                    <p:calendar value="#{cc.attrs.value.endTime}"
-                                disabled="#{!cc.attrs.value.selected}"
-                                pattern="HH:mm"
-                                timeOnly="true">
-                    </p:calendar>
-                </h:panelGroup>
-            </h:panelGrid>
-        </p:outputPanel>
+       
     </cc:implementation>
 </html>

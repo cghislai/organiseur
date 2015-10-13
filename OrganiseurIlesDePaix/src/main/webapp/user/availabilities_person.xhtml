@@ -19,15 +19,15 @@
             <h:form styleClass="centerForm">
                 <p:inputText type="number" value="#{registerAvailabilitiesController.personAmount}">
                     <p:ajax event="change"
-                        update=":availabilitiesLinksForm"/>
+                            update="availabilitiesLinksForm"/>
                 </p:inputText>
 
-            </h:form>
-            <h:form id="availabilitiesLinksForm" styleClass="availabilitiesLinksForm">
-                <p:commandButton styleClass="nextButton"
-                                 value="Suivant"
-                                 disabled="#{registerAvailabilitiesController.personAmount lt 1}"
-                                 action="#{registerAvailabilitiesController.actionShowDates()}"/>
+                <p:outputPanel id="availabilitiesLinksForm" styleClass="availabilitiesLinksForm">
+                    <p:commandButton styleClass="nextButton"
+                                     value="Suivant"
+                                     disabled="#{registerAvailabilitiesController.personAmount lt 1}"
+                                     action="#{registerAvailabilitiesController.actionShowDates()}"/>
+                </p:outputPanel>
             </h:form>
         </ui:define>
     </ui:composition>

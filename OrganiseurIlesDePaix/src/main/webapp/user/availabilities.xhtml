@@ -22,6 +22,9 @@
                         Le programme est disponible <h:link>ici</h:link>
                     </p:outputPanel>
                 </p:outputPanel>
+                <p:outputPanel rendered="#{not globalPreferencesController.registrationClosed}">
+                    Pour réencoder vos emplacements, cliquez <h:commandLink action="#{registerAvailabilitiesController.actionCancel()}">ici</h:commandLink>
+                </p:outputPanel>
                 <p:outputPanel id="calendar">
                     <table>
                         <tr>

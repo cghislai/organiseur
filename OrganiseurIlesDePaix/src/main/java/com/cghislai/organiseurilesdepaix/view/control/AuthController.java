@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -51,6 +52,10 @@ public class AuthController implements Serializable {
             userSessionController.updateAvailabilities();;
         } catch (ServletException ex) {
             Logger.getLogger(AuthController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        HttpSession session = request.getSession();
+        if (session != null) {
+            session.invalidate();
         }
         return Views.INDEX;
     }

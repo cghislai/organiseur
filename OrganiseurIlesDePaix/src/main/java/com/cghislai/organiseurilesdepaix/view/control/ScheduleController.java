@@ -15,11 +15,9 @@ import com.cghislai.organiseurilesdepaix.service.CampaignDatesService;
 import com.cghislai.organiseurilesdepaix.service.CampaignEventService;
 import com.cghislai.organiseurilesdepaix.service.GlobalPreferenceService;
 import com.cghislai.organiseurilesdepaix.service.LocationService;
-import com.cghislai.organiseurilesdepaix.service.UserService;
 import com.cghislai.organiseurilesdepaix.service.search.CampaignDaySearch;
 import com.cghislai.organiseurilesdepaix.service.search.CampaignEventSearch;
 import com.cghislai.organiseurilesdepaix.service.search.LocationSearch;
-import com.cghislai.organiseurilesdepaix.service.search.SolverInfo;
 import com.cghislai.organiseurilesdepaix.util.DateUtils;
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -89,13 +87,8 @@ public class ScheduleController implements Serializable {
     }
 
     public void actionGenerate() {
-        SolverInfo solverInfo = new SolverInfo();
-        List<CampaignDay> campaignDays = campaignDatesService.findAllDays();
-        solverInfo.setCampaignDay(campaignDays);
-        List<Location> allLocations = locationService.findLocations(new LocationSearch());
-        solverInfo.setLocations(allLocations);
         solverRunning = true;
-        solverResult = solverService.resolve(solverInfo);
+        solverResult = solverService.resolve();
     }
 
     public void actionCheckDone() {
@@ -113,9 +106,9 @@ public class ScheduleController implements Serializable {
         try {
             // Save campaign events
             List<CampaignEvent> events = solverResult.get();
-            for (CampaignEvent event : events) {
+            events.stream().forEach((event) -> {
                 campaignEventService.saveCampaignEvent(event);
-            }
+            });
             loadSchedule();
         } catch (InterruptedException | ExecutionException ex) {
             // TODO: add message
@@ -146,13 +139,13 @@ public class ScheduleController implements Serializable {
         campaignEventService.deleteAllCampaignEvents();
         searchAmounts();
     }
-    
+
     public void actionSaveEvent() {
         campaignEventService.saveCampaignEvent(editingEvent);
         editingEvent = null;
         loadSchedule();
     }
-    
+
     public void onEventSelect(SelectEvent selectEvent) {
         CampaignScheduleEvent event = (CampaignScheduleEvent) selectEvent.getObject();
         editingEvent = event.getEvent();
@@ -183,8 +176,6 @@ public class ScheduleController implements Serializable {
         scheduleEvent.setEvent(newEvent);
     }
 
-    
-
     private void searchAmounts() {
         usersAmount = availabilityService.countUsersWithAvailabilites();
         locationsAmount = locationService.countLocation(new LocationSearch());
@@ -209,7 +200,6 @@ public class ScheduleController implements Serializable {
         return Objects.equals(scheduleOnline, Boolean.TRUE)
                 || campaignEventsAmount > 0;
     }
-
 
     public String getCampaignDayLabel(CampaignDay campaignDay) {
         DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy");

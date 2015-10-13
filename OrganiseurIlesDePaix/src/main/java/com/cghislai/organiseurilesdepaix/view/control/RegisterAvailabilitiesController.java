@@ -14,6 +14,7 @@ import com.cghislai.organiseurilesdepaix.domain.util.Pagination;
 import com.cghislai.organiseurilesdepaix.service.AvailabilityService;
 import com.cghislai.organiseurilesdepaix.service.CampaignDatesService;
 import com.cghislai.organiseurilesdepaix.service.LocationService;
+import com.cghislai.organiseurilesdepaix.service.search.AvailabilitySearch;
 import com.cghislai.organiseurilesdepaix.service.search.LocationSearch;
 import com.cghislai.organiseurilesdepaix.util.DateUtils;
 import com.cghislai.organiseurilesdepaix.util.MyLazyDataModel;
@@ -101,6 +102,15 @@ public class RegisterAvailabilitiesController implements Serializable {
 
     public boolean isAnyLocationSelected() {
         return selectedLocations.size() > 0;
+    }
+
+    public String actionCancel() {
+        AvailabilitySearch availabilitySearch = new AvailabilitySearch();
+        User authenticatedUser = authController.getAuthenticatedUser();
+        availabilitySearch.setUser(authenticatedUser);
+        List<Availability> findAvailabilities = availabilityService.findAvailabilities(availabilitySearch);
+        findAvailabilities.forEach(availability -> availabilityService.removeAvailability(availability));
+        return actionShow();
     }
 
     public String actionRegister() {

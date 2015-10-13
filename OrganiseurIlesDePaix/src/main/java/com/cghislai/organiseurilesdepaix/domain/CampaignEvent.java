@@ -39,10 +39,10 @@ public class CampaignEvent implements Serializable {
     @ManyToOne
     private CampaignDay campaignDay;
     @Column(nullable = false)
-    @Temporal( TemporalType.TIME)
+    @Temporal(TemporalType.TIME)
     private Date startTime;
     @Column(nullable = false)
-    @Temporal( TemporalType.TIME)
+    @Temporal(TemporalType.TIME)
     private Date endTime;
     @Column(nullable = false)
     private Integer personAmount;

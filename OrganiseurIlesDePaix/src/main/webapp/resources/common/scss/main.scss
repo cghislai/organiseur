@@ -1,0 +1,134 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 10-Dec-2015, 11:37:42
+    Author     : cghislai
+*/
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+header.mainHeader {
+    background-color: #EA2E49;
+    padding: 0em;
+    .logo {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .title {
+        font-size: 2em;
+        font-weight: bolder;
+        display: inline-block;
+        vertical-align: middle;
+        color: #001156;
+    }
+
+    .mainHeader form {
+        display: inline;
+    }
+    form#toolsForm {
+        float: right;
+    }
+
+
+    nav#mainNav {
+        padding: 0.2em;
+        a {
+            font-size: 1em;
+            font-weight: bolder;
+            color: white;
+            text-decoration: none;
+            padding-left: 0.3em;
+            padding-right: 0.3em;
+
+            &:hover {
+                color: yellow;
+            }
+        }
+    }
+}
+
+
+div.content {
+    margin: 1em;
+    text-align: center;
+}
+
+form.centerForm {
+    text-align: center;
+    display: inline-block;
+}
+
+.infoTip {
+    margin: 0.5em;
+    &.warning {
+        background-color: beige;
+    }
+    p {
+        font-weight: lighter;
+        font-size: 0.95em;
+        padding: 0.2em;
+        margin: 0;
+    }
+}
+
+table.formTable {
+    display: block;
+    > tbody{
+        display: inline-block;
+        > tr > td {
+            text-align: left;
+            &:first-child {
+                text-align: right;
+                padding-right: 0.2em;
+            }
+        }
+    }
+}
+
+.timeSlot {
+    width: 4em;
+    height: 2em;
+    border: 1px solid black;
+    display: inline-block;
+    margin: .1em;
+    padding: .2em;
+    text-decoration: none;
+
+    &.filled {
+        background-color: darkgreen;
+        .label {
+            font-size: .8em;
+            color: white;
+        }
+    }
+    &:not(.filled) {
+        background-color: white;
+        .label {
+            font-size: .8em;
+            color: black;
+        }
+    }
+
+    &.editable {
+        &:hover {
+            cursor: pointer;
+        }
+        &.filled {
+            &:hover {
+                background-color: lighten(darkgreen, .30);
+            }
+        }
+        &:not(.filled) {
+            &:hover {
+                background-color: darken(white, .30);
+            }
+        }
+    }
+
+
+}

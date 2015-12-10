@@ -21,7 +21,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "location_time_slot")
-public class LocationTimeSlot implements Serializable {
+public class LocationTimeSlot implements Serializable, WithId {
 
     @Id
     @Column

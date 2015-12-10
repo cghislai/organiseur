@@ -20,7 +20,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "location")
-public class Location implements Serializable {
+public class Location implements Serializable, WithId {
 
     @Id
     @GeneratedValue

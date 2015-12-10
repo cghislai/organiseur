@@ -107,4 +107,6 @@ public class LocationTimeSlotService implements Serializable {
         LocationTimeSlot mergedLocationTimeSlot = entityManager.merge(locationTimeSlot);
         entityManager.remove(mergedLocationTimeSlot);
     }
+
+    
 }

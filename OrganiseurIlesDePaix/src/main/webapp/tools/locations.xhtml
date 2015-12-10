@@ -34,9 +34,6 @@
                     <p:column headerText="Localité">
                         #{location.city}
                     </p:column>
-                    <p:column headerText="Personnes requises">
-                        #{location.requriedPersonAmount}
-                    </p:column>
                     <p:column headerText="Actions">
                         <p:commandButton action="#{locationsController.actionEditLocation(location)}"
                                          value="Modifier"
@@ -72,10 +69,7 @@
                             <h:inputText value="#{location.postalCode}" required="true" />
                             <h:outputLabel value="Localité: "/>
                             <h:inputText value="#{location.city}" required="true" />
-                            <h:outputLabel value="Personnes requises : "/>
-                            <p:spinner value="#{location.requriedPersonAmount}" required="true">
-                                <f:validateDoubleRange minimum="1" />
-                            </p:spinner>
+                            
                             <h:outputLabel value="Latitude:"/>
                             <h:outputText value="#{location.latitude}"/>
                             <h:outputLabel value="Longitude:"/>

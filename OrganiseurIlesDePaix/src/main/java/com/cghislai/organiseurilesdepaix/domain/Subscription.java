@@ -20,7 +20,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "subscription")
-public class Subscription implements Serializable {
+public class Subscription implements Serializable, WithId {
 
     @Column(nullable = false)
     @Id

@@ -6,28 +6,26 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
     <changeSet id="0" author="cghislai">
-        <createTable tableName="location">
+        <createTable tableName="subscription">
             <column name="ID" type="BIGINT(19)" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="NAME" type="VARCHAR(255)" >
+            <column name="USER_ID" type="BIGINT(19)" >
                 <constraints nullable="false" />
             </column>
-            <column name="ADDRESS" type="LONGTEXT" >
-                <constraints nullable="false" />
-            </column>
-            <column name="POSTALCODE" type="VARCHAR(255)" >
-                <constraints nullable="false" />
-            </column>
-            <column name="CITY" type="VARCHAR(255)" >
+            <column name="LOCATION_SLOT_ID" type="BIGINT(19)" >
                 <constraints nullable="false" />
             </column>
         </createTable>
     </changeSet>
+    <changeSet id="1" author="cghislai">
+        <addForeignKeyConstraint baseTableName="subscription" baseColumnNames="USER_ID"
+                                 constraintName="lsubscription_USER_ID"
+                                 referencedTableName="ouser" referencedColumnNames="ID"/>
+    </changeSet>
     <changeSet id="2" author="cghislai">
-        <addColumn tableName="location">
-            <column name="LATITUDE" type="FLOAT(10)" />
-            <column name="LONGITUDE" type="FLOAT(10)" />
-        </addColumn>
+        <addForeignKeyConstraint baseTableName="subscription" baseColumnNames="LOCATION_SLOT_ID"
+                                 constraintName="subscription_LOCATION_SLOT_ID"
+                                 referencedTableName="location_time_slot" referencedColumnNames="ID" />
     </changeSet>
 </databaseChangeLog>

@@ -5,40 +5,31 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
-    
     <changeSet id="0" author="cghislai">
-        <createTable tableName="ouser">
+        <createTable tableName="location_time_slot">
             <column name="ID" type="BIGINT(19)" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="USER_NAME" type="VARCHAR(255)" >
+            <column name="LOCATION_ID" type="BIGINT(19)" >
                 <constraints nullable="false" />
             </column>
-            <column name="EMAIL" type="VARCHAR(255)" >
+            <column name="CAMPAIGNDAY_ID" type="BIGINT(19)" >
                 <constraints nullable="false" />
             </column>
-            <column name="PASSWORD_HASH" type="VARCHAR(255)" >
-                <constraints nullable="false" />
-            </column>
-            <column name="IS_ADMIN" type="BIT" defaultValueBoolean="false">
+            <column name="START_TIME" type="INT" >
                 <constraints nullable="false" />
             </column>
         </createTable>
     </changeSet>
+    
     <changeSet id="1" author="cghislai">
-        <sql>
-            INSERT INTO ouser (USER_NAME, EMAIL, PASSWORD_HASH, IS_ADMIN)
-            VALUES ("admin", "admin@nomail.com", "", TRUE);
-        </sql>
+        <addForeignKeyConstraint baseTableName="location_time_slot" baseColumnNames="LOCATION_ID"
+                                 constraintName="location_slot_location_ID"
+                                 referencedTableName="location" referencedColumnNames="ID"/>
     </changeSet>
     <changeSet id="2" author="cghislai">
-        <addColumn tableName="ouser">
-            <column name="HUMAN_NAME" type="MEDIUMTEXT"/>
-        </addColumn>
-    </changeSet>
-    <changeSet id="3" author="cghislai">
-        <addColumn tableName="ouser">
-            <column name="TELEPHONE" type="MEDIUMTEXT"/>
-        </addColumn>
+        <addForeignKeyConstraint baseTableName="location_time_slot" baseColumnNames="CAMPAIGNDAY_ID"
+                                 constraintName="location_slot_CAMPAIGNDAY_ID"
+                                 referencedTableName="campaign_day" referencedColumnNames="ID" />
     </changeSet>
 </databaseChangeLog>

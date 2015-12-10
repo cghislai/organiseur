@@ -33,6 +33,8 @@ public class User {
     private boolean admin;
     @Column(name = "HUMAN_NAME")
     private String humanName;
+    @Column(name = "TELEPHONE")
+    private String telephone;
 
     public Long getId() {
         return id;
@@ -80,6 +82,14 @@ public class User {
 
     public void setHumanName(String humanName) {
         this.humanName = humanName;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 
     @Override

@@ -6,6 +6,7 @@
 package com.cghislai.organiseurilesdepaix.service;
 
 import com.cghislai.organiseurilesdepaix.domain.Location;
+import com.cghislai.organiseurilesdepaix.domain.LocationTimeSlot;
 import com.cghislai.organiseurilesdepaix.domain.Location_;
 import com.cghislai.organiseurilesdepaix.domain.util.LocationCoordinateInfo;
 import com.cghislai.organiseurilesdepaix.domain.util.Pagination;
@@ -16,7 +17,6 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CompoundSelection;
 import javax.persistence.criteria.CriteriaBuilder;

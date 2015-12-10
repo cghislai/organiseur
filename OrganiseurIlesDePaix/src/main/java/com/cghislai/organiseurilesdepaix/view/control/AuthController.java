@@ -27,10 +27,6 @@ import javax.servlet.http.HttpSession;
 @SessionScoped
 public class AuthController implements Serializable {
 
-    @Inject
-    private UserSessionController userSessionController;
-    
-    
     private User authenticatedUser;
 
     public User getAuthenticatedUser() {
@@ -39,7 +35,6 @@ public class AuthController implements Serializable {
 
     public void actionAuthenticateUser(User user) {
         authenticatedUser = user;
-        userSessionController.updateAvailabilities();;
     }
 
     public String actionDeauthenticateUser() {
@@ -49,7 +44,6 @@ public class AuthController implements Serializable {
         try {
             request.logout();
             authenticatedUser = null;
-            userSessionController.updateAvailabilities();;
         } catch (ServletException ex) {
             Logger.getLogger(AuthController.class.getName()).log(Level.SEVERE, null, ex);
         }

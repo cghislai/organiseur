@@ -42,12 +42,6 @@
                 <h:link outcome="/user/register"
                         rendered="#{not authController.userAuthenticated}"
                         value="Créer un compte"/>
-                <h:link outcome="/user/availabilities_person"
-                        rendered="#{authController.userAuthenticated and not userSessionController.hasAvailabilities and not globalPreferencesController.registrationClosed}"
-                        value="Enregistrer ses disponibilités"/>
-                <h:link outcome="/user/availabilities"
-                        rendered="#{authController.userAuthenticated and userSessionController.hasAvailabilities}"
-                        value="Mes disponibilités"/>
                 <h:link outcome="/user/account"
                         rendered="#{authController.userAuthenticated}"
                         value="Modifier son compte"/>

@@ -70,29 +70,101 @@ table.formTable {
         text-align: right;
         padding-right: 0.2em; }
 
+.slotRow {
+  width: 50em; }
+
 .timeSlot {
-  width: 4em;
-  height: 2em;
-  border: 1px solid black;
+  width: 8em;
+  height: 3em;
   display: inline-block;
+  border: 1px solid black;
   margin: .1em;
   padding: .2em;
-  text-decoration: none; }
+  text-decoration: none;
+  vertical-align: middle;
+  background-color: white; }
+  .timeSlot.editable:hover {
+    cursor: pointer;
+    background-color: #e6e6e6; }
+  .timeSlot:not(.editable) {
+    cursor: default; }
+  .timeSlot .label {
+    font-size: .8em;
+    color: black;
+    display: inline-block;
+    vertical-align: center; }
   .timeSlot.filled {
     background-color: darkgreen; }
+    .timeSlot.filled.editable:hover {
+      background-color: #009700; }
     .timeSlot.filled .label {
       font-size: .8em;
       color: white; }
-  .timeSlot:not(.filled) {
-    background-color: white; }
-    .timeSlot:not(.filled) .label {
+  .timeSlot.closed {
+    background-color: gray; }
+  .timeSlot.filled-1 {
+    background-color: orange; }
+    .timeSlot.filled-1.editable:hover {
+      background-color: #ffb733; }
+    .timeSlot.filled-1 .label {
       font-size: .8em;
       color: black; }
-  .timeSlot.editable:hover {
-    cursor: pointer; }
-  .timeSlot.editable.filled:hover {
-    background-color: #006600; }
-  .timeSlot.editable:not(.filled):hover {
-    background-color: #fefefe; }
+  .timeSlot.filled-2 {
+    background-color: darkgreen; }
+    .timeSlot.filled-2.editable:hover {
+      background-color: #009700; }
+    .timeSlot.filled-2 .label {
+      font-size: .8em;
+      color: white; }
+
+.availabiliesLocationsPanel {
+  display: block;
+  margin: auto; }
+  .availabiliesLocationsPanel .left {
+    display: inline-block;
+    vertical-align: top;
+    min-width: 30em; }
+  .availabiliesLocationsPanel .map {
+    display: inline-block;
+    vertical-align: top;
+    width: 50em; }
+    .availabiliesLocationsPanel .map form {
+      height: 40em; }
+      .availabiliesLocationsPanel .map form > * {
+        width: 100%;
+        height: 100%; }
+  .availabiliesLocationsPanel .locationSelectRow {
+    display: table-row; }
+    .availabiliesLocationsPanel .locationSelectRow .locationListItem {
+      padding: .3em .5em;
+      text-align: left;
+      display: table-cell;
+      vertical-align: middle; }
+      .availabiliesLocationsPanel .locationSelectRow .locationListItem p {
+        margin: .1em 0;
+        font-size: .9em; }
+    .availabiliesLocationsPanel .locationSelectRow .locationListSelectionPanel {
+      display: table-cell;
+      width: 10em;
+      text-align: right;
+      vertical-align: middle; }
+
+.availabilitiesSlotsPanel {
+  display: block;
+  margin: auto;
+  text-align: center; }
+  .availabilitiesSlotsPanel > div {
+    display: inline-block; }
+  .availabilitiesSlotsPanel h2 {
+    display: inline-block; }
+  .availabilitiesSlotsPanel .daySlotsPanel {
+    display: table-row; }
+    .availabilitiesSlotsPanel .daySlotsPanel .dayLabel {
+      font-weight: bold;
+      text-align: left;
+      vertical-align: middle;
+      display: table-cell; }
+    .availabilitiesSlotsPanel .daySlotsPanel .slotsRow {
+      display: table-cell; }
 
 /*# sourceMappingURL=main.css.map */

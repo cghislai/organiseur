@@ -45,6 +45,9 @@
                 <h:link outcome="/user/account"
                         rendered="#{authController.userAuthenticated}"
                         value="Modifier son compte"/>
+                <h:link outcome="/user/availabilities"
+                        rendered="#{authController.userAuthenticated}"
+                        value="Disponibilités"/>
                 <h:form id="logoutForm"
                         style="float: right;"
                         rendered="#{authController.userAuthenticated}">

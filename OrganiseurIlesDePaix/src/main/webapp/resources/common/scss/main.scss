@@ -66,7 +66,7 @@ form.centerForm {
 .infoTip {
     padding: 0.5em;
     margin: auto;
-    
+
     &.warning {
         background-color: beige;
     }
@@ -95,45 +95,143 @@ table.formTable {
     }
 }
 
+.slotRow {
+    width: 50em;
+}
 .timeSlot {
-    width: 4em;
-    height: 2em;
-    border: 1px solid black;
+    width: 8em;
+    height: 3em;
     display: inline-block;
+    border: 1px solid black;
     margin: .1em;
     padding: .2em;
     text-decoration: none;
+    vertical-align: middle;
+
+    background-color: white;
+    &.editable {
+        &:hover {
+            cursor: pointer;
+            background-color: darken(white, 10%);
+        }
+    }
+    &:not(.editable) {
+        cursor: default;
+    }
+
+    .label {
+        font-size: .8em;
+        color: black;
+        display: inline-block;
+        vertical-align: center;
+    }
+
 
     &.filled {
         background-color: darkgreen;
+        &.editable:hover {
+            background-color: lighten(darkgreen, 10%);
+        }
         .label {
             font-size: .8em;
             color: white;
         }
     }
-    &:not(.filled) {
-        background-color: white;
+    &.closed {
+        background-color: gray;
+    }
+    &.filled-0 {
+
+    }
+    &.filled-1 {
+        background-color: orange;
+        &.editable:hover {
+            background-color: lighten(orange, 10%);
+        }
         .label {
             font-size: .8em;
             color: black;
         }
     }
+    &.filled-2 {
+        background-color: darkgreen;
+        &.editable:hover {
+            background-color: lighten(darkgreen, 10%);
+        }
+        .label {
+            font-size: .8em;
+            color: white;
+        }
+    }
+}
 
-    &.editable {
-        &:hover {
-            cursor: pointer;
-        }
-        &.filled {
-            &:hover {
-                background-color: lighten(darkgreen, .30);
-            }
-        }
-        &:not(.filled) {
-            &:hover {
-                background-color: darken(white, .30);
+.availabiliesLocationsPanel {
+    display: block;
+    margin: auto;
+
+    .left {
+        display: inline-block;
+        vertical-align: top;
+        min-width: 30em;
+    }
+
+    .map {
+        display:inline-block;
+        vertical-align: top;
+            width: 50em;
+
+        form  {
+            height: 40em;
+            >*{
+                width: 100%;
+                height: 100%;
             }
         }
     }
 
+    .locationSelectRow {
+        display: table-row;
 
+        .locationListItem {
+            padding: .3em .5em;
+            text-align: left;
+            display: table-cell;
+            vertical-align: middle;
+            p {
+                margin: .1em 0;
+                font-size: .9em;
+            }
+        }
+
+        .locationListSelectionPanel {
+            display: table-cell;
+            width: 10em;
+            text-align: right;
+            vertical-align: middle;
+        }
+    }
+}
+.availabilitiesSlotsPanel {
+    display: block;
+    margin: auto;
+    text-align: center;
+    >div {
+        display: inline-block;
+    }
+    h2 {
+        display: inline-block;
+    }
+    .daySlotsPanel {
+        display: table-row;
+
+        .dayLabel {
+            font-weight: bold;
+            text-align: left;
+            vertical-align: middle;
+            display: table-cell;
+        }
+        .slotsRow {
+            display: table-cell;
+        }
+    }
 }

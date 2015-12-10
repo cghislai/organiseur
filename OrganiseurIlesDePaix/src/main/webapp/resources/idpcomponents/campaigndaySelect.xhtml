@@ -16,14 +16,14 @@
     <!-- IMPLEMENTATION -->
     <cc:implementation>
         <h:panelGroup rendered="#{cc.attrs.editable}">
-            <p:selectOneMenu value="#{cc.attrs.campaignDay}"
-                             id="selectMenu"
-                             converter="withIdConverter">
+            <p:selectOneButton value="#{cc.attrs.campaignDay}"
+                               id="selectMenu"
+                               converter="withIdConverter">
                 <f:selectItems value="#{campaignDatesController.campaignDays}"
                                var="dayVal"
                                itemLabel="#{campaignDatesController.getCampaignDateLabel(dayVal)}"
                                itemValue="#{dayVal}" />
-            </p:selectOneMenu>
+            </p:selectOneButton>
         </h:panelGroup>
         <h:outputText value="#{campaignDatesController.getCampaignDateLabel(cc.attrs.campaignDay)}" 
                       rendered="#{not cc.attrs.editable}">

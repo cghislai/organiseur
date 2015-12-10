@@ -14,7 +14,6 @@
 
         <ui:define name="body">
             <h:form id="listForm">
-                Date: 
                 <idpcomponents:campaigndaySelect campaignDay="#{locationSlotsController.campaignDay}"
                                                  editable="true">
                     <p:ajax event="change"
@@ -31,13 +30,12 @@
                     <p:column headerText="Location">
                         #{locationWithSlots.location.name}
                     </p:column>
-                    <p:column headerText="Crénaux">
+                    <p:column headerText="Crénaux" styleClass="slotRow">
                         <ui:repeat value="#{timeSlotController.allSlots}"
                                    var="time">
                             <c:set value="#{locationWithSlots.slots[time]}"
                                    var="locationSlot"/>
-                            <idpcomponents:timeslot filled="#{locationSlot != null}"
-                                                    editable="true"
+                            <idpcomponents:timeslot styleClass="editable #{locationSlot != null ? 'filled': 'closed'}"
                                                     label="#{timeSlotController.getSlotLabel(time)}"
                                                     id="slot">
                                 <p:ajax event="click"

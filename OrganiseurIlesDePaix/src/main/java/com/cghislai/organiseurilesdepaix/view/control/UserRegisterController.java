@@ -37,6 +37,7 @@ public class UserRegisterController implements Serializable {
     private String login;
     private String humanName;
     private String email;
+    private String telephone;
     private String password1;
     private String password2;
 
@@ -45,17 +46,18 @@ public class UserRegisterController implements Serializable {
             showError("Les mots de passe ne correspondent pas");
             return null;
         }
-        
+
         String encodedPassword = LoginController.encodePassword(password1);
-        
+
         User newUser = new User();
         newUser.setAdmin(false);
         newUser.setEmail(email);
         newUser.setPasswordHash(encodedPassword);
         newUser.setUserName(login);
         newUser.setHumanName(humanName);
+        newUser.setTelephone(telephone);
         User managedUser = userService.saveUser(newUser);
-        
+
         // Login
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
@@ -69,6 +71,7 @@ public class UserRegisterController implements Serializable {
         }
         return Views.INDEX;
     }
+
     private void showError(String message) {
         FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null);
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -121,6 +124,14 @@ public class UserRegisterController implements Serializable {
 
     public void setHumanName(String humanName) {
         this.humanName = humanName;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 
 }

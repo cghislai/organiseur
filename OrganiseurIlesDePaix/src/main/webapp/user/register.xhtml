@@ -12,6 +12,14 @@
         </ui:define>
         <ui:define name="body">
             <h:form id="registerForm" styleClass="centerForm">
+                <p:outputPanel styleClass="infoTip medium">
+                    <p>
+                        Merci pour votre engagement.
+                        Créer un compte ne prend que quelques secondes. Après avoir
+                        rempli ce formulaire, vous pourrez directement choisir vos
+                        horaires et disponibilités.
+                    </p>
+                </p:outputPanel>
                 <p:messages />
                 <p:focus/>
                 <h:panelGrid columns="2"
@@ -34,6 +42,12 @@
                         <f:validateLength minimum="4"/>
                         <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$"/>
                     </p:inputText>
+                    <h:outputLabel value="Téléphone:"/>
+                    <p:inputText value="#{userRegisterController.telephone}"
+                                 id="telephone"
+                                 validatorMessage="Le numéro de téléphone est incorrect">
+                        <f:validateRegex pattern="^([0-9]{3,4}/?[0-9]{5,7})?$"/>
+                    </p:inputText>
                     <h:outputLabel value="Login:"/>
                     <p:inputText value="#{userRegisterController.login}"
                                  id="login"
@@ -44,22 +58,24 @@
                     </p:inputText>
                     <h:outputLabel value="Mot de passe:"/>
                     <p:password value="#{userRegisterController.password1}"
-                                 id="motdepasse"
-                                 required="true"
-                                 requiredMessage="Veuillez entrer un mot de passe"
-                                 validatorMessage="Le mot de passe doit faire minimum 8 charactères">
+                                id="motdepasse"
+                                required="true"
+                                requiredMessage="Veuillez entrer un mot de passe"
+                                validatorMessage="Le mot de passe doit faire minimum 8 charactères">
                         <f:validateLength minimum="8"/>
                     </p:password>
-                    <h:outputLabel value="Vérifier le mot de passe:"/>
+                    <h:outputLabel value="Vérifiez le mot de passe:"/>
                     <p:password value="#{userRegisterController.password2}"
-                                 id="confirmationmotdepasse"
-                                 required="true"
-                                 requiredMessage="Veuiller confirmer votre mot de passe"
-                                 validatorMessage="Le mot de passe doit faire minimum 8 charactères">
+                                id="confirmationmotdepasse"
+                                required="true"
+                                requiredMessage="Veuiller confirmer votre mot de passe"
+                                validatorMessage="Le mot de passe doit faire minimum 8 charactères">
                         <f:validateLength minimum="8"/>
                         <o:validateEqual components="motdepasse confirmationmotdepasse"
                                          message="Les mot de passe ne correspondent pas"/>
                     </p:password>
+                    <h:outputLabel value="Confirmez que vous êtes humain:"/>
+                    <p:captcha label="Captcha"  theme="light"/>
                 </h:panelGrid>
 
                 <p:commandButton value="Enregistrer"

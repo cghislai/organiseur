@@ -45,12 +45,15 @@ div.content {
 
 form.centerForm {
   text-align: center;
-  display: inline-block; }
+  margin: auto; }
 
 .infoTip {
-  margin: 0.5em; }
+  padding: 0.5em;
+  margin: auto; }
   .infoTip.warning {
     background-color: beige; }
+  .infoTip.medium {
+    max-width: 30em; }
   .infoTip p {
     font-weight: lighter;
     font-size: 0.95em;

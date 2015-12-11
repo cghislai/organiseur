@@ -1,0 +1,235 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 10-Dec-2015, 11:37:42
+    Author     : cghislai
+*/
+body {
+  margin: 0;
+  font-family: sans-serif; }
+  body a {
+    text-decoration: none;
+    color: blue; }
+    body a:hover {
+      color: black; }
+
+header.mainHeader {
+  background-color: #EA2E49;
+  padding: 0em; }
+  header.mainHeader .logo {
+    display: inline-block;
+    vertical-align: middle; }
+  header.mainHeader .title {
+    font-size: 2em;
+    font-weight: bolder;
+    display: inline-block;
+    vertical-align: middle;
+    color: #001156; }
+  header.mainHeader .mainHeader form {
+    display: inline; }
+  header.mainHeader form#toolsForm {
+    float: right; }
+  header.mainHeader nav#mainNav {
+    padding: 0.2em; }
+    header.mainHeader nav#mainNav a {
+      font-size: 1em;
+      font-weight: bolder;
+      color: white;
+      text-decoration: none;
+      padding-left: 0.3em;
+      padding-right: 0.3em; }
+      header.mainHeader nav#mainNav a:hover {
+        color: yellow; }
+
+div.content {
+  margin: 1em;
+  text-align: center; }
+
+form.centerForm {
+  text-align: center;
+  margin: auto; }
+
+.infoTip {
+  padding: 0.5em;
+  margin: auto; }
+  .infoTip.warning {
+    background-color: beige; }
+  .infoTip.medium {
+    max-width: 30em; }
+  .infoTip p {
+    font-weight: lighter;
+    font-size: 0.95em;
+    padding: 0.2em;
+    margin: 0; }
+
+.formTip {
+  margin: .3em;
+  font-size: .9em;
+  color: gray; }
+
+table.formTable {
+  display: block; }
+  table.formTable > tbody {
+    display: inline-block; }
+    table.formTable > tbody > tr > td {
+      text-align: left; }
+      table.formTable > tbody > tr > td:first-child {
+        text-align: right;
+        padding-right: 0.2em; }
+
+.welcomeBlock {
+  margin: 2em auto; }
+  .welcomeBlock a {
+    display: inline-block;
+    margin: 1em;
+    font-size: 1.2em;
+    text-decoration: none; }
+
+.slotRow {
+  width: 50em; }
+
+.timeSlot {
+  width: 8em;
+  height: 3em;
+  display: inline-block;
+  border: 1px solid black;
+  margin: .1em;
+  padding: .2em;
+  text-decoration: none;
+  vertical-align: middle;
+  background-color: white; }
+  .timeSlot.editable:hover {
+    cursor: pointer;
+    background-color: #e6e6e6; }
+  .timeSlot:not(.editable) {
+    cursor: default; }
+  .timeSlot .label {
+    font-size: .8em;
+    color: black;
+    display: inline-block;
+    vertical-align: center; }
+  .timeSlot.filled {
+    background-color: darkgreen; }
+    .timeSlot.filled.editable:hover {
+      background-color: #009700; }
+    .timeSlot.filled .label {
+      font-size: .8em;
+      color: white; }
+  .timeSlot.closed {
+    background-color: gray; }
+  .timeSlot.filled-1 {
+    background-color: orange; }
+    .timeSlot.filled-1.editable:hover {
+      background-color: #ffb733; }
+    .timeSlot.filled-1 .label {
+      font-size: .8em;
+      color: black; }
+  .timeSlot.filled-2 {
+    background-color: darkgreen; }
+    .timeSlot.filled-2.editable:hover {
+      background-color: #009700; }
+    .timeSlot.filled-2 .label {
+      font-size: .8em;
+      color: white; }
+
+.editSlotsRow {
+  width: 60em; }
+
+.editSlot {
+  display: inline-block;
+  vertical-align: top;
+  height: 100%;
+  width: 10em;
+  border: .1em solid black;
+  padding: .5em;
+  background-color: white; }
+  .editSlot.closed {
+    background-color: lightgray; }
+  .editSlot label {
+    display: block;
+    text-align: center;
+    font-weight: bold;
+    font-size: .9em; }
+  .editSlot a {
+    font-size: .7em;
+    color: blue; }
+  .editSlot .ui-widget-content {
+    border: none; }
+  .editSlot .subscription {
+    display: table;
+    width: 100%;
+    table-layout: fixed; }
+    .editSlot .subscription > a, .editSlot .subscription > .user {
+      display: table-cell;
+      vertical-align: middle;
+      padding: .3em 0; }
+    .editSlot .subscription a {
+      text-align: right;
+      width: 1em; }
+    .editSlot .subscription .user {
+      width: 2em;
+      text-align: left;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      font-size: .8em; }
+
+.subscriptionDialog a {
+  color: blue;
+  padding: .5em;
+  display: block; }
+
+.availabiliesLocationsPanel {
+  display: block;
+  margin: auto; }
+  .availabiliesLocationsPanel .left {
+    display: inline-block;
+    vertical-align: top;
+    min-width: 30em; }
+  .availabiliesLocationsPanel .map {
+    display: inline-block;
+    vertical-align: top;
+    width: 50em; }
+    .availabiliesLocationsPanel .map form {
+      height: 40em; }
+      .availabiliesLocationsPanel .map form > * {
+        width: 100%;
+        height: 100%; }
+  .availabiliesLocationsPanel .locationSelectRow {
+    display: table-row; }
+    .availabiliesLocationsPanel .locationSelectRow .locationListItem {
+      padding: .3em .5em;
+      text-align: left;
+      display: table-cell;
+      vertical-align: middle; }
+      .availabiliesLocationsPanel .locationSelectRow .locationListItem p {
+        margin: .1em 0;
+        font-size: .9em; }
+    .availabiliesLocationsPanel .locationSelectRow .locationListSelectionPanel {
+      display: table-cell;
+      width: 10em;
+      text-align: right;
+      vertical-align: middle; }
+
+.availabilitiesSlotsPanel {
+  display: block;
+  margin: auto;
+  text-align: center; }
+  .availabilitiesSlotsPanel > div {
+    display: inline-block; }
+  .availabilitiesSlotsPanel h2 {
+    display: inline-block; }
+  .availabilitiesSlotsPanel .daySlotsPanel {
+    display: table-row; }
+    .availabilitiesSlotsPanel .daySlotsPanel .dayLabel {
+      font-weight: bold;
+      text-align: left;
+      vertical-align: middle;
+      display: table-cell; }
+    .availabilitiesSlotsPanel .daySlotsPanel .slotsRow {
+      display: table-cell; }
+
+/*# sourceMappingURL=main.css.map */

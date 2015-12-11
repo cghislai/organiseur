@@ -98,6 +98,10 @@
                                      requiredMessage="Veuillez entrer un login"
                                      validatorMessage="Le login doit faire au moins 4 charactères">
                         </p:inputText>
+                        <h:outputLabel value=""/>
+                        <p:selectBooleanCheckbox value="#{user.admin}"
+                                                 label="Administrateur"
+                                                 itemLabel="Administrateur"/>
                         <h:outputLabel value="Mot de passe:"/>
                         <h:panelGroup>
                             

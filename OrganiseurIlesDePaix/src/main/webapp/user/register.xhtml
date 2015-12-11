@@ -26,13 +26,17 @@
                              styleClass="formTable"
                              style="margin: 1em;">
                     <h:outputLabel value="Nom:"/>
-                    <p:inputText value="#{userRegisterController.humanName}"
-                                 id="nom"
-                                 required="true"
-                                 requiredMessage="Veuillez entrer un nom"
-                                 validatorMessage="Le nom doit faire minimum 4 charactères">
-                        <f:validateLength minimum="4"/>
-                    </p:inputText>
+                    <h:panelGroup>
+                        <p:inputText value="#{userRegisterController.humanName}"
+                                     id="nom"
+                                     required="true"
+                                     requiredMessage="Veuillez entrer un nom"
+                                     validatorMessage="Le nom doit faire minimum 4 charactères">
+                            <f:validateLength minimum="4"/>
+                        </p:inputText>
+                        <h:outputText styleClass="formTip"
+                                      value="Ce nom sera visible pour tous les inscrits"/>
+                    </h:panelGroup>
                     <h:outputLabel value="E-mail:"/>
                     <p:inputText value="#{userRegisterController.email}"
                                  id="email"
@@ -43,11 +47,16 @@
                         <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$"/>
                     </p:inputText>
                     <h:outputLabel value="Téléphone:"/>
-                    <p:inputText value="#{userRegisterController.telephone}"
-                                 id="telephone"
-                                 validatorMessage="Le numéro de téléphone est incorrect">
-                        <f:validateRegex pattern="^([0-9]{3,4}/?[0-9]{5,7})?$"/>
-                    </p:inputText>
+                    <h:panelGroup>
+
+                        <p:inputText value="#{userRegisterController.telephone}"
+                                     id="telephone"
+                                     validatorMessage="Le numéro de téléphone est incorrect">
+                            <f:validateRegex pattern="^([0-9]{3,4}/?[0-9]{5,7})?$"/>
+                        </p:inputText>
+                        <h:outputText styleClass="formTip"
+                                      value="Pas requis"/>
+                    </h:panelGroup>
                     <h:outputLabel value="Login:"/>
                     <p:inputText value="#{userRegisterController.login}"
                                  id="login"

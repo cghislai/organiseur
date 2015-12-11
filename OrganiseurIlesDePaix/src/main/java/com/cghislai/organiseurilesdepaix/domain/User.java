@@ -28,11 +28,11 @@ public class User implements Serializable, WithId {
     private String userName;
     @Column(nullable = false)
     private String email;
-    @Column(name = "PASSWORD_HASH", nullable = false)
+    @Column(name = "PASSWORD_HASH")
     private String passwordHash;
     @Column(name = "IS_ADMIN", nullable = false)
     private boolean admin;
-    @Column(name = "HUMAN_NAME")
+    @Column(name = "HUMAN_NAME", nullable = false)
     private String humanName;
     @Column(name = "TELEPHONE")
     private String telephone;

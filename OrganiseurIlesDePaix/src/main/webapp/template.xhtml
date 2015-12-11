@@ -33,6 +33,8 @@
                                 value="Horaires des emplacements"/>
                     <p:menuitem outcome="/tools/users"
                                 value="Utilisateurs"/>
+                    <p:menuitem outcome="/tools/schedule"
+                                value="Programme"/>
                 </p:menuButton>
             </h:form>
             <nav id="mainNav">
@@ -46,8 +48,11 @@
                         rendered="#{authController.userAuthenticated}"
                         value="Modifier son compte"/>
                 <h:link outcome="/user/availabilities"
-                        rendered="#{authController.userAuthenticated}"
+                        rendered="#{authController.userAuthenticated and not globalPreferencesController.registrationClosed}"
                         value="Disponibilités"/>
+                 <h:link outcome="/user/contact"
+                        rendered="#{authController.userAuthenticated}"
+                        value="Contact"/>
                 <h:form id="logoutForm"
                         style="float: right;"
                         rendered="#{authController.userAuthenticated}">

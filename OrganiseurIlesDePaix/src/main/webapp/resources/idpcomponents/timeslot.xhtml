@@ -24,7 +24,8 @@
         </p:commandLink>
         <p:tooltip id="toolTipFade" for="slotPanel"
                    trackMouse="true"
-                   rendered="#{not empty cc.attrs.tooltip}">
+                   showDelay="500"
+                   rendered="#{not empty cc.attrs.tooltip and authController.userAuthenticated}">
             <h:outputText value="#{cc.attrs.tooltip}"
                           styleClass="slotTooltip"
                           escape="false"/>

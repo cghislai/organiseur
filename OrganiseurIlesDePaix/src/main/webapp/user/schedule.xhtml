@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:idpcomponents="http://xmlns.jcp.org/jsf/composite/idpcomponents">
+
+    <h:form  id="schedule" rendered="#{authController.userAuthenticated}">
+        <h2>Mon programme</h2>
+        <p:outputPanel styleClass="availabilitiesSlotsPanel" >
+            <p:outputPanel rendered="#{not empty scheduleController.userScheduleMap}">
+                <p:messages showDetail="true" />
+                <ui:repeat value="#{scheduleController.allCampaignDays}"
+                           var="day">
+                    <p:outputPanel styleClass="daySlotsPanel">
+                        <p:outputPanel styleClass="dayLabel">
+                            <idpcomponents:campaigndaySelect campaignDay="#{day}"/>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="slotsRow">
+                            <ui:repeat value="#{timeSlotController.allSlots}"
+                                       var="time">
+                                <c:set value="#{scheduleController.userScheduleMap[day]}"
+                                       var="slotsMap"/>
+                                <c:set value="#{slotsMap[time]}"
+                                       var="slotStatus"/>
+                                <idpcomponents:timeslot styleClass="#{(slotStatus == null) ? 'closed' : ''} #{slotStatus.userSubscribed ? 'filled' : '' }"
+                                                        label="#{slotStatus == null ? '' : slotStatus.label}"
+                                                        tooltip="#{slotStatus == null ? '' : slotStatus.tooltip}"
+                                                        id="slot">
+                                </idpcomponents:timeslot>
+                            </ui:repeat>
+                        </p:outputPanel>
+                    </p:outputPanel>
+                </ui:repeat>
+            </p:outputPanel>
+        </p:outputPanel>
+    </h:form>
+</html>
+

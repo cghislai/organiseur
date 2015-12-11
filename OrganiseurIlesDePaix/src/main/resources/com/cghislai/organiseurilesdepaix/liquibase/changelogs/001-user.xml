@@ -29,10 +29,10 @@
                 <constraints nullable="false" />
             </column>
             <column name="EMAIL" type="VARCHAR(255)" >
-                <constraints nullable="false" />
+                <constraints/>
             </column>
             <column name="PASSWORD_HASH" type="VARCHAR(255)" >
-                <constraints nullable="false" />
+                <constraints />
             </column>
             <column name="IS_ADMIN" type="BIT" defaultValueBoolean="false">
                 <constraints nullable="false" />
@@ -47,7 +47,9 @@
     </changeSet>
     <changeSet id="2" author="cghislai">
         <addColumn tableName="ouser">
-            <column name="HUMAN_NAME" type="MEDIUMTEXT"/>
+            <column name="HUMAN_NAME" type="MEDIUMTEXT">
+                <constraints nullable="false" />
+            </column>
         </addColumn>
     </changeSet>
     <changeSet id="3" author="cghislai">

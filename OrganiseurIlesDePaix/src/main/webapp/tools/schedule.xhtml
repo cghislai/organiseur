@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:idpcomponents="http://xmlns.jcp.org/jsf/composite/idpcomponents"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            Édition du programme
+        </ui:define>
+        <ui:define name="body">
+            <p:outputPanel rendered="#{globalPreferencesController.registrationClosed}"
+                           styleClass="infoTip">
+                <h:outputText value="Les inscriptions sont clôturées"/>
+            </p:outputPanel>
+            <p:outputPanel styleClass="globalSchedule">
+                <h:form id="scheduleForm">
+                    <idpcomponents:campaigndaySelect campaignDay="#{editScheduleController.campaignDay}"
+                                                     editable="true">
+                        <p:ajax event="change"
+                                update=":scheduleForm:locationList"
+                                listener="#{editScheduleController.searchLocationsSlots()}"/>
+                    </idpcomponents:campaigndaySelect>
+                    <p:dataTable value="#{editScheduleController.locationsModel}"
+                                 var="locationWithSlotStatus"
+                                 lazy="true"
+                                 emptyMessage="Aucun emplacement"
+                                 first="0"
+                                 rows="10"
+                                 paginator="true"
+                                 paginatorAlwaysVisible="false"
+                                 paginatorPosition="bottom"
+                                 id="locationList">
+                        <p:column headerText="Emplacement">
+                            #{locationWithSlotStatus.location.name}
+                        </p:column>
+                        <p:column headerText="Créneaux" styleClass="editSlotsRow">
+                            <ui:repeat value="#{timeSlotController.allSlots}"
+                                       var="time">
+                                <c:set value="#{locationWithSlotStatus.slots[time]}"
+                                       var="slotStatus"/>
+
+                                <p:outputPanel styleClass="editSlot #{slotStatus == null ? 'closed' : ''}">
+                                    <label>#{timeSlotController.getSlotLabel(time)}</label>
+                                    <p:dataList value="#{slotStatus.subscriptions}"
+                                                rendered="#{not empty slotStatus.subscriptions}"
+                                                var="subscription"
+                                                emptyMessage=""
+                                                type="none">
+                                        <p:outputPanel styleClass="subscription">
+                                            <h:outputText styleClass="user"
+                                                          value="#{subscription.user.humanName}"
+                                                          title="#{subscription.user.humanName}"/>
+                                            <h:commandLink styleClass="action remove">
+                                                <p:ajax update="@form"
+                                                        listener="#{editScheduleController.actionRemoveSubscription(subscription)}"/>
+                                                Supprimer
+                                            </h:commandLink>
+                                        </p:outputPanel>
+                                    </p:dataList>
+                                    <h:commandLink styleClass="action add" rendered="#{slotStatus != null}">
+                                        <p:ajax update="@form:addSubscriptionPanel"
+                                                listener="#{editScheduleController.actionEditForSlot(slotStatus.timeSlot)}"/>
+                                        Ajouter
+                                    </h:commandLink>
+                                </p:outputPanel>
+                            </ui:repeat>
+
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:outputPanel id="addSubscriptionPanel">
+                        <p:dialog id="subscriptionDialog" styleClass="subscriptionDialog"
+                                  rendered="#{editScheduleController.editingTimeSlot != null}"
+                                  visible="true"
+                                  header="Ajouter un utilisateur">
+                            Chercher par nom:
+                            <p:inputText value="#{usersController.userSearch.nameLike}">
+                                <p:ajax event="keyup" delay="500"
+                                        listener="#{usersController.actionSearch()}"
+                                        update="userList"/>
+                            </p:inputText>
+                            <p:outputPanel id="userList">
+                                <p:dataList value="#{usersController.usersModel}"
+                                            var="user" lazy="true"
+                                            emptyMessage="Aucun utilisateur trouvé"
+                                            type="none"
+                                            rows="5">
+                                    <p:commandLink action="#{editScheduleController.actionAddUser(user)}"
+                                                   styleClass="addUserLink"
+                                                   value="#{user.humanName}"
+                                                   update="@form"/>
+                                </p:dataList>
+                                <p:commandLink action="#{editScheduleController.actionCreateUser(usersController.userSearch.nameLike)}"
+                                               rendered="#{!usersController.usersModel.rowAvailable and not empty usersController.userSearch.nameLike}"
+                                               value="Créer un nouvel utilisateur avec ce nom"
+                                               update="@form"/>
+                            </p:outputPanel>
+                        </p:dialog>
+                    </p:outputPanel>
+                </h:form>
+            </p:outputPanel>
+        </ui:define>
+    </ui:composition> 
+</html>
+

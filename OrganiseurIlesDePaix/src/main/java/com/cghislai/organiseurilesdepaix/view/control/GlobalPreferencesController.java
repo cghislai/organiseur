@@ -5,6 +5,7 @@
  */
 package com.cghislai.organiseurilesdepaix.view.control;
 
+import com.cghislai.organiseurilesdepaix.domain.GlobalPreference;
 import com.cghislai.organiseurilesdepaix.service.GlobalPreferenceService;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
@@ -32,7 +33,13 @@ public class GlobalPreferencesController implements Serializable {
     }
 
     private void searchPreferences() {
-        registrationClosed = globalPreferenceService.getPreferenceBooleanValue(GlobalPreferenceService.KEY_REGISTRATION_CLOSED);
+        GlobalPreference registrationClosedPref = globalPreferenceService.getGlobalPreference(GlobalPreferenceService.KEY_REGISTRATION_CLOSED);
+        if (registrationClosedPref == null) {
+            globalPreferenceService.setPreferenceBoolean(GlobalPreferenceService.KEY_REGISTRATION_CLOSED, true);
+            registrationClosed = true;
+        } else {
+            registrationClosed = globalPreferenceService.getPreferenceBooleanValue(GlobalPreferenceService.KEY_REGISTRATION_CLOSED);
+        }
         scheduleOnline = globalPreferenceService.getPreferenceBooleanValue(GlobalPreferenceService.KEY_SCHEDULE_ONLINE);
     }
 

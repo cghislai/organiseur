@@ -28,6 +28,8 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.FacesException;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.event.map.OverlaySelectEvent;
@@ -58,6 +60,8 @@ public class AvailabilitiesController implements Serializable {
     private CampaignDatesService campaignDatesService;
     @Inject
     private TimeSlotController timeSlotController;
+    @Inject
+    private CampaignDatesController campaignDatesController;
 
     private LazyDataModel<Location> locationsModel;
     private Location selectedLocation;
@@ -137,12 +141,18 @@ public class AvailabilitiesController implements Serializable {
         subscriptionSearch.setLocation(selectedLocation);
         subscriptionSearch.setStartHour(time);
         Long subscriptionsCount = subscriptionService.countSubscriptions(subscriptionSearch);
+        List<Subscription> subscriptions = subscriptionService.searchSubscriptions(subscriptionSearch, new Pagination(0, 5));
+
+        subscriptionSearch.setUser(authController.getAuthenticatedUser());
+        Long userSubscriptionCount = subscriptionService.countSubscriptions(subscriptionSearch);
+        boolean userSubscribed = userSubscriptionCount > 0;
+
         String timeLabel = timeSlotController.getSlotLabel(time);
         String amountLabel = (subscriptionsCount == 0 ? "Aucune" : subscriptionsCount)
                 + " personne"
                 + (subscriptionsCount > 1 ? "s" : "");
-        String label = timeLabel + "<br>" + amountLabel;
-        List<Subscription> subscriptions = subscriptionService.searchSubscriptions(subscriptionSearch, new Pagination(0, 5));
+        String subscribedLabel = (userSubscribed ? "(Inscrit)" : "");
+        String label = timeLabel + "<br>" + amountLabel + "<br>" + subscribedLabel;
         String usersLabel = subscriptions.stream()
                 .map(subscription -> subscription.getUser().getHumanName())
                 .reduce("", (userNames, userName) -> (userNames.isEmpty() ? "" : userNames + "<br>") + userName);
@@ -150,9 +160,6 @@ public class AvailabilitiesController implements Serializable {
             long diff = subscriptionsCount - subscriptions.size();
             usersLabel += "<br>Et " + diff + " autre" + (diff > 1 ? "s" : "");
         }
-        subscriptionSearch.setUser(authController.getAuthenticatedUser());
-        Long userSubscriptionCount = subscriptionService.countSubscriptions(subscriptionSearch);
-        boolean userSubscribed = userSubscriptionCount > 0;
         SlotStatus slotStatus = new SlotStatus();
         slotStatus.setSubscriptionAmount(subscriptionsCount);
         slotStatus.setTimeSlot(locationSlot);
@@ -219,25 +226,40 @@ public class AvailabilitiesController implements Serializable {
         LocationTimeSlot timeSlot = slotStatus.getTimeSlot();
         SubscriptionSearch subscriptionSearch = new SubscriptionSearch();
         subscriptionSearch.setCampaignDay(timeSlot.getCampaignDay());
-        subscriptionSearch.setLocation(selectedLocation);
         subscriptionSearch.setStartHour(timeSlot.getStartTime());
         subscriptionSearch.setUser(authController.getAuthenticatedUser());
-        List<Subscription> subscriptions = subscriptionService.searchSubscriptions(subscriptionSearch, null);
         if (subscribed) {
-            if (!subscriptions.isEmpty()) {
-                throw new FacesException("Already subscribed");
+            long subscriptionCount = subscriptionService.countSubscriptions(subscriptionSearch);
+            if (subscriptionCount > 0) {
+                List<Subscription> subscriptions = subscriptionService.searchSubscriptions(subscriptionSearch, null);
+                for (Subscription subscription : subscriptions) {
+                    FacesContext facesContext = FacesContext.getCurrentInstance();
+                    FacesMessage facesMessage = new FacesMessage();
+                    String title = "Déjà inscrit";
+                    String label = "Déjà inscrit le " + campaignDatesController.getCampaignDateLabel(subscription.getLocationTimeSlot().getCampaignDay());
+                    label += " pour " + timeSlotController.getSlotLabel(subscription.getLocationTimeSlot().getStartTime());
+                    label += " à l'emplacement " + subscription.getLocationTimeSlot().getLocation().getName();
+                    facesMessage.setSeverity(FacesMessage.SEVERITY_ERROR);
+                    facesMessage.setSummary(title);
+                    facesMessage.setDetail(label);
+                    facesContext.addMessage(null, facesMessage);
+                }
+                return;
             }
             Subscription subscription = new Subscription();
             subscription.setLocationTimeSlot(timeSlot);
             subscription.setUser(authController.getAuthenticatedUser());
             subscriptionService.saveSubscription(subscription);
         } else {
+            subscriptionSearch.setLocation(selectedLocation);
+            List<Subscription> subscriptions = subscriptionService.searchSubscriptions(subscriptionSearch, null);
             if (subscriptions.size() != 1) {
                 throw new FacesException("Not a single subscription");
             }
             subscriptionService.deleteSubscription(subscriptions.get(0));
         }
         searchSlotsStatus();
+        authController.searchSubscribed();
     }
 
     private void checkLocationSearch() {

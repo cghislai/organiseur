@@ -9,6 +9,7 @@
 
     <p:outputPanel styleClass="globalSchedule">
         <h:form id="scheduleForm">
+            <h2>Programme</h2>
             <idpcomponents:campaigndaySelect campaignDay="#{scheduleController.campaignDay}"
                                              editable="true">
                 <p:ajax event="change"
@@ -19,20 +20,23 @@
                          var="locationWithSlotStatus"
                          lazy="true"
                          emptyMessage="Aucun emplacement"
-                         rows="20"
                          first="0"
+                         rows="10"
+                         paginator="true"
+                         paginatorAlwaysVisible="false"
+                         paginatorPosition="bottom"
                          id="locationList">
-                <p:column headerText="Location">
+                <p:column headerText="Emplacement">
                     #{locationWithSlotStatus.location.name}
                 </p:column>
-                <p:column headerText="Crénaux" styleClass="slotRow">
+                <p:column headerText="Créneaux" styleClass="slotRow">
                     <ui:repeat value="#{timeSlotController.allSlots}"
                                var="time">
                         <c:set value="#{locationWithSlotStatus.slots[time]}"
                                var="slotStatus"/>
                         <idpcomponents:timeslot styleClass="#{slotStatus == null ? 'closed' : ''} filled-#{slotStatus.subscriptionAmount}"
                                                 label="#{slotStatus == null ? '-' : slotStatus.label}"
-                                                tooltip="#{slotStatus == null ? '-' : slotStatus.tooltip}"
+                                                tooltip="#{slotStatus == null ? '' : slotStatus.tooltip}"
                                                 id="slot">
                         </idpcomponents:timeslot>
                     </ui:repeat>

@@ -27,10 +27,10 @@
                              rows="20"
                              first="0"
                              id="locationList">
-                    <p:column headerText="Location">
+                    <p:column headerText="Emplacement">
                         #{locationWithSlots.location.name}
                     </p:column>
-                    <p:column headerText="Crénaux" styleClass="slotRow">
+                    <p:column headerText="Créneaux" styleClass="slotRow">
                         <ui:repeat value="#{timeSlotController.allSlots}"
                                    var="time">
                             <c:set value="#{locationWithSlots.slots[time]}"

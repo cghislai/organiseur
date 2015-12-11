@@ -23,7 +23,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -59,6 +58,7 @@ public class ScheduleController implements Serializable {
     private CampaignDay campaignDay;
     private List<CampaignDay> allCampaignDays;
     private LazyDataModel<LocationDayWithSlotsStatus> locationsModel;
+    private HashMap<CampaignDay, Map<Long, SlotStatus>> userScheduleMap;
 
     @PostConstruct
     public void init() {
@@ -79,6 +79,7 @@ public class ScheduleController implements Serializable {
             return;
         }
         locationsModel = new LocationsModel();
+        createUserScheduleSlotStatus();
     }
 
     public CampaignDay getCampaignDay() {
@@ -95,6 +96,112 @@ public class ScheduleController implements Serializable {
 
     public LazyDataModel<LocationDayWithSlotsStatus> getLocationsModel() {
         return locationsModel;
+    }
+
+    public HashMap<CampaignDay, Map<Long, SlotStatus>> getUserScheduleMap() {
+        return userScheduleMap;
+    }
+
+    private void createUserScheduleSlotStatus() {
+        this.userScheduleMap = new HashMap<>();
+        if (!authController.isUserAuthenticated()) {
+            return;
+        }
+        List<CampaignDay> allDays = campaignDateService.findAllDays();
+        for (CampaignDay day : allDays) {
+            List<Long> timeSlots = timeSlotController.getAllSlots();
+            Map<Long, SlotStatus> slotsStatusMap = new HashMap<>();
+            for (Long time : timeSlots) {
+                SubscriptionSearch subscriptionSearch = new SubscriptionSearch();
+                subscriptionSearch.setCampaignDay(day);
+                subscriptionSearch.setStartHour(time);
+                subscriptionSearch.setUser(authController.getAuthenticatedUser());
+                Long countSubscriptions = subscriptionService.countSubscriptions(subscriptionSearch);
+                boolean subscribed = countSubscriptions > 0;
+
+                SlotStatus slotStatus = new SlotStatus();
+                slotStatus.setEditable(false);
+                slotStatus.setLabel(subscribed ? "Inscrit" : "");
+                slotStatus.setUserSubscribed(subscribed);
+
+                String label = timeSlotController.getSlotLabel(time);
+                String tooltip = "";
+
+                if (subscribed) {
+                    List<Subscription> subscriptions = subscriptionService.searchSubscriptions(subscriptionSearch, new Pagination(0, 1));
+                    Subscription subscription = subscriptions.get(0);
+                    slotStatus.setTimeSlot(subscription.getLocationTimeSlot());
+                    final Location location = subscription.getLocationTimeSlot().getLocation();
+
+                    label += "<br>" + location.getName();
+                    tooltip = location.getAddress() + "<br>" + location.getCity();
+                }
+                slotStatus.setLabel(label);
+                slotStatus.setTooltip(tooltip);
+                slotsStatusMap.put(time, slotStatus);
+
+            }
+            userScheduleMap.put(day, slotsStatusMap);
+        }
+    }
+
+    private LocationDayWithSlotsStatus createLocationWithSlotStatus(Location location) {
+        Map<Long, SlotStatus> slotsMap = new HashMap<>();
+        List<Long> timeSlots = timeSlotController.getAllSlots();
+
+        timeSlots.stream()
+                .forEach((Long time) -> {
+                    LocationTimeSlotSearch locationTimeSlotSearch = new LocationTimeSlotSearch();
+                    locationTimeSlotSearch.setCampaignDay(campaignDay);
+                    locationTimeSlotSearch.setLocation(location);
+                    locationTimeSlotSearch.setStartHour(time);
+                    List<LocationTimeSlot> locationsSlots = locationTimeSlotService.searchLocationTimeSlots(locationTimeSlotSearch, null);
+                    if (locationsSlots.size() > 1) {
+                        throw new FacesException("Multiple location slot");
+                    }
+                    if (locationsSlots.isEmpty()) {
+                        slotsMap.put(time, null);
+                        return;
+                    }
+                    LocationTimeSlot locationSlot = locationsSlots.get(0);
+                    SubscriptionSearch subscriptionSearch = new SubscriptionSearch();
+                    subscriptionSearch.setCampaignDay(campaignDay);
+                    subscriptionSearch.setLocation(location);
+                    subscriptionSearch.setStartHour(time);
+                    Long subscriptionsCount = subscriptionService.countSubscriptions(subscriptionSearch);
+
+                    String timeLabel = timeSlotController.getSlotLabel(time);
+                    String amountLabel = (subscriptionsCount == 0 ? "Aucune" : subscriptionsCount)
+                    + " personne"
+                    + (subscriptionsCount > 1 ? "s" : "");
+                    String label = timeLabel + "<br>" + amountLabel;
+                    List<Subscription> subscriptions = subscriptionService.searchSubscriptions(subscriptionSearch, new Pagination(0, 5));
+                    String usersLabel = subscriptions.stream()
+                    .map(subscription -> subscription.getUser().getHumanName())
+                    .reduce("", (userNames, userName) -> (userNames.isEmpty() ? "" : userNames + "<br>") + userName);
+                    if (subscriptions.size() < subscriptionsCount) {
+                        long diff = subscriptionsCount - subscriptions.size();
+                        usersLabel += "<br>Et " + diff + " autre" + (diff > 1 ? "s" : "");
+                    }
+
+                    subscriptionSearch.setUser(authController.getAuthenticatedUser());
+                    Long userSubscriptionCount = subscriptionService.countSubscriptions(subscriptionSearch);
+                    boolean userSubscribed = userSubscriptionCount > 0;
+
+                    SlotStatus slotStatus = new SlotStatus();
+                    slotStatus.setSubscriptionAmount(subscriptionsCount);
+                    slotStatus.setTimeSlot(locationSlot);
+                    slotStatus.setLabel(label);
+                    slotStatus.setTooltip(usersLabel);
+                    slotStatus.setUserSubscribed(userSubscribed);
+                    slotsMap.put(time, slotStatus);
+                });
+
+        LocationDayWithSlotsStatus locationWithSlots = new LocationDayWithSlotsStatus();
+        locationWithSlots.setCampaignDay(campaignDay);
+        locationWithSlots.setLocation(location);
+        locationWithSlots.setSlots(slotsMap);
+        return locationWithSlots;
     }
 
     private class LocationsModel extends LazyDataModel<LocationDayWithSlotsStatus> {
@@ -120,68 +227,10 @@ public class ScheduleController implements Serializable {
             List<Location> locaitons = locationService.findLocations(locationSearch);
 
             List<LocationDayWithSlotsStatus> locationsList = locaitons.stream()
-                    .map(this::createLocationWithSlotStatus)
+                    .map(ScheduleController.this::createLocationWithSlotStatus)
                     .collect(Collectors.toList());
             return locationsList;
         }
 
-        private LocationDayWithSlotsStatus createLocationWithSlotStatus(Location location) {
-            Map<Long, SlotStatus> slotsMap = new HashMap<>();
-            List<Long> timeSlots = timeSlotController.getAllSlots();
-
-            timeSlots.stream()
-                    .forEach((Long time) -> {
-                        LocationTimeSlotSearch locationTimeSlotSearch = new LocationTimeSlotSearch();
-                        locationTimeSlotSearch.setCampaignDay(campaignDay);
-                        locationTimeSlotSearch.setLocation(location);
-                        locationTimeSlotSearch.setStartHour(time);
-                        List<LocationTimeSlot> locationsSlots = locationTimeSlotService.searchLocationTimeSlots(locationTimeSlotSearch, null);
-                        if (locationsSlots.size() > 1) {
-                            throw new FacesException("Multiple location slot");
-                        }
-                        if (locationsSlots.isEmpty()) {
-                            slotsMap.put(time, null);
-                            return;
-                        }
-                        LocationTimeSlot locationSlot = locationsSlots.get(0);
-                        SubscriptionSearch subscriptionSearch = new SubscriptionSearch();
-                        subscriptionSearch.setCampaignDay(campaignDay);
-                        subscriptionSearch.setLocation(location);
-                        subscriptionSearch.setStartHour(time);
-                        Long subscriptionsCount = subscriptionService.countSubscriptions(subscriptionSearch);
-
-                        String timeLabel = timeSlotController.getSlotLabel(time);
-                        String amountLabel = (subscriptionsCount == 0 ? "Aucune" : subscriptionsCount)
-                        + " personne"
-                        + (subscriptionsCount > 1 ? "s" : "");
-                        String label = timeLabel + "<br>" + amountLabel;
-                        List<Subscription> subscriptions = subscriptionService.searchSubscriptions(subscriptionSearch, new Pagination(0, 5));
-                        String usersLabel = subscriptions.stream()
-                        .map(subscription -> subscription.getUser().getHumanName())
-                        .reduce("", (userNames, userName) -> (userNames.isEmpty() ? "" : userNames + "<br>") + userName);
-                        if (subscriptions.size() < subscriptionsCount) {
-                            long diff = subscriptionsCount - subscriptions.size();
-                            usersLabel += "<br>Et " + diff + " autre" + (diff > 1 ? "s" : "");
-                        }
-
-                        subscriptionSearch.setUser(authController.getAuthenticatedUser());
-                        Long userSubscriptionCount = subscriptionService.countSubscriptions(subscriptionSearch);
-                        boolean userSubscribed = userSubscriptionCount > 0;
-
-                        SlotStatus slotStatus = new SlotStatus();
-                        slotStatus.setSubscriptionAmount(subscriptionsCount);
-                        slotStatus.setTimeSlot(locationSlot);
-                        slotStatus.setLabel(label);
-                        slotStatus.setTooltip(usersLabel);
-                        slotStatus.setUserSubscribed(userSubscribed);
-                        slotsMap.put(time, slotStatus);
-                    });
-
-            LocationDayWithSlotsStatus locationWithSlots = new LocationDayWithSlotsStatus();
-            locationWithSlots.setCampaignDay(campaignDay);
-            locationWithSlots.setLocation(location);
-            locationWithSlots.setSlots(slotsMap);
-            return locationWithSlots;
-        }
     }
 }

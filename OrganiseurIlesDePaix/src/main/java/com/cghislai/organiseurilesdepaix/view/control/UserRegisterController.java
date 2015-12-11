@@ -69,7 +69,7 @@ public class UserRegisterController implements Serializable {
             showError("Impossible d'ouvrir la session");
             return Views.USER_LOGIN;
         }
-        return Views.INDEX;
+        return Views.USER_AVAILABILITIES;
     }
 
     private void showError(String message) {

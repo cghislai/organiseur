@@ -54,18 +54,12 @@
                     <h:outputLabel value="Mot de passe:"/>
                     <p:password value="#{userController.password1}"
                                 id="motdepasse"
-                                required="true"
-                                requiredMessage="Veuillez entrer un mot de passe"
                                 validatorMessage="Le mot de passe doit faire minimum 4 charactères">
-                        <f:validateLength minimum="4"/>
                     </p:password>
                     <h:outputLabel value="Vérifier le mot de passe:"/>
                     <p:password value="#{userController.password2}"
                                 id="confirmationmotdepasse"
-                                required="true"
-                                requiredMessage="Veuiller confirmer votre mot de passe"
                                 validatorMessage="Le mot de passe doit faire minimum 8 charactères">
-                        <f:validateLength minimum="4"/>
                         <o:validateEqual components="motdepasse confirmationmotdepasse"
                                          message="Les mot de passe ne correspondent pas"/>
                     </p:password>

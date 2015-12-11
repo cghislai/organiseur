@@ -6,6 +6,8 @@
 package com.cghislai.organiseurilesdepaix.view.domain;
 
 import com.cghislai.organiseurilesdepaix.domain.LocationTimeSlot;
+import com.cghislai.organiseurilesdepaix.domain.Subscription;
+import java.util.List;
 
 /**
  *
@@ -19,6 +21,7 @@ public class SlotStatus {
     private String tooltip;
     private boolean userSubscribed;
     private boolean editable;
+    private List<Subscription> subscriptions;
 
     public LocationTimeSlot getTimeSlot() {
         return timeSlot;
@@ -66,6 +69,14 @@ public class SlotStatus {
 
     public void setEditable(boolean editable) {
         this.editable = editable;
+    }
+
+    public List<Subscription> getSubscriptions() {
+        return subscriptions;
+    }
+
+    public void setSubscriptions(List<Subscription> subscriptions) {
+        this.subscriptions = subscriptions;
     }
 
 }

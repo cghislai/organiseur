@@ -9,7 +9,6 @@ import com.cghislai.organiseurilesdepaix.domain.Location;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -20,7 +19,6 @@ import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
 import javax.json.Json;
 import javax.json.JsonArray;
-import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
@@ -64,7 +62,7 @@ public class LocationServiceUtils {
         JsonString longitude = jsonObject.getJsonString("lon");
         JsonString displayName = jsonObject.getJsonString("display_name");
         System.out.println(displayName.getString());
-        
+
         Float latitudeFloat = Float.valueOf(latitude.getString());
         Float longitudeFloat = Float.valueOf(longitude.getString());
 

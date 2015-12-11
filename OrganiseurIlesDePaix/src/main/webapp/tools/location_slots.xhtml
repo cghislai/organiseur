@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:idpcomponents="http://xmlns.jcp.org/jsf/composite/idpcomponents">
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            Horaires par emplacement
+        </ui:define>
+
+        <ui:define name="body">
+            <h:form id="listForm">
+                <idpcomponents:campaigndaySelect campaignDay="#{locationSlotsController.campaignDay}"
+                                                 editable="true">
+                    <p:ajax event="change"
+                            update=":listForm:locationList"
+                            listener="#{locationSlotsController.searchLocationsSlots()}"/>
+                </idpcomponents:campaigndaySelect>
+                <p:dataTable value="#{locationSlotsController.locationsModel}"
+                             var="locationWithSlots"
+                             lazy="true"
+                             emptyMessage="Aucun emplacement"
+                             rows="20"
+                             first="0"
+                             id="locationList">
+                    <p:column headerText="Emplacement">
+                        #{locationWithSlots.location.name}
+                    </p:column>
+                    <p:column headerText="Créneaux" styleClass="slotRow">
+                        <ui:repeat value="#{timeSlotController.allSlots}"
+                                   var="time">
+                            <c:set value="#{locationWithSlots.slots[time]}"
+                                   var="locationSlot"/>
+                            <idpcomponents:timeslot styleClass="editable #{locationSlot != null ? 'filled': 'closed'}"
+                                                    label="#{timeSlotController.getSlotLabel(time)}"
+                                                    id="slot">
+                                <p:ajax event="click"
+                                        listener="#{locationSlotsController.onLocationSlotChanged(locationWithSlots.location, time, locationSlot == null)}"
+                                        update="@form:locationList"/>
+                            </idpcomponents:timeslot>
+                        </ui:repeat>
+
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

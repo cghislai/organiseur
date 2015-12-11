@@ -5,15 +5,20 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
-    <changeSet id="sequence" author="cghislai">
+    
+    <changeSet id="-1" author="cghislai">
         <createTable tableName="sequence">
-            <column name="SEQ_NAME" type="VARCHAR(255)" />
-            <column name="SEQ_COUNT" type="BIGINT(19)" />
+            <column name="SEQ_NAME" type="VARCHAR(255)">
+                <constraints primaryKey="true"/>
+            </column> 
+            <column name="SEQ_COUNT" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet id="sequence-entry" author="cghislai">
-        <sql>INSERT INTO sequence (SEQ_NAME, SEQ_COUNT)
-            VALUES ("SEQ_GEN", 0)</sql>
+    <changeSet id="-2" author="cghislai">
+        <sql>
+            INSERT INTO sequence (SEQ_NAME, SEQ_COUNT)
+            VALUES ("SEQ_GEN", 2);
+        </sql>
     </changeSet>
     <changeSet id="0" author="cghislai">
         <createTable tableName="ouser">
@@ -24,10 +29,10 @@
                 <constraints nullable="false" />
             </column>
             <column name="EMAIL" type="VARCHAR(255)" >
-                <constraints nullable="false" />
+                <constraints/>
             </column>
             <column name="PASSWORD_HASH" type="VARCHAR(255)" >
-                <constraints nullable="false" />
+                <constraints />
             </column>
             <column name="IS_ADMIN" type="BIT" defaultValueBoolean="false">
                 <constraints nullable="false" />
@@ -42,7 +47,14 @@
     </changeSet>
     <changeSet id="2" author="cghislai">
         <addColumn tableName="ouser">
-            <column name="HUMAN_NAME" type="MEDIUMTEXT"/>
+            <column name="HUMAN_NAME" type="MEDIUMTEXT">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="3" author="cghislai">
+        <addColumn tableName="ouser">
+            <column name="TELEPHONE" type="MEDIUMTEXT"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

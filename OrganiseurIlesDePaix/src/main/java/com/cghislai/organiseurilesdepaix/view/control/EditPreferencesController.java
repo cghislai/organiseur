@@ -7,6 +7,7 @@ package com.cghislai.organiseurilesdepaix.view.control;
 
 import com.cghislai.organiseurilesdepaix.service.GlobalPreferenceService;
 import java.io.Serializable;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -30,6 +31,7 @@ public class EditPreferencesController implements Serializable {
     private String contactPhone1;
     private String contactPhone2;
 
+    @PostConstruct
     public void init() {
         search();
     }

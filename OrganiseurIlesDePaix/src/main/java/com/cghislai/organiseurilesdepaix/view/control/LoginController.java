@@ -38,7 +38,7 @@ public class LoginController implements Serializable {
     private UserService userService;
     @Inject
     private AuthController authController;
-    
+
     private String userNameOrMail;
     private String password;
 
@@ -53,12 +53,18 @@ public class LoginController implements Serializable {
         try {
             String encodedPass = encodePassword(password);
             request.login(userNameOrMail, encodedPass);
-            
+
             UserSearch userSearch = new UserSearch();
             userSearch.setLoginOrMail(userNameOrMail);
             User user = userService.searchUser(userSearch);
             authController.actionAuthenticateUser(user);
-            return Views.INDEX;
+
+            boolean userSubscribed = authController.isUserSubscribed();
+            if (userSubscribed) {
+                return Views.INDEX;
+            } else {
+                return Views.USER_AVAILABILITIES;
+            }
         } catch (ServletException ex) {
             onLoginFail(ex);
             return null;
@@ -80,7 +86,7 @@ public class LoginController implements Serializable {
             byte[] encoded = digest.digest(password.getBytes("UTF-8"));
             byte[] base64Encoded = Base64.getEncoder().encode(encoded);
             String encodedString = new String(base64Encoded, "UTF-8");
-            
+
             return encodedString;
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
             Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);

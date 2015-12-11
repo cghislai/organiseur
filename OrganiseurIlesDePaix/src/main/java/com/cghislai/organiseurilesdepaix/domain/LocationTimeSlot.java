@@ -6,7 +6,6 @@
 package com.cghislai.organiseurilesdepaix.domain;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,37 +14,27 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  *
  * @author cghislai
  */
 @Entity
-@Table(name="availability")
-public class Availability implements Serializable{
+@Table(name = "location_time_slot")
+public class LocationTimeSlot implements Serializable, WithId {
 
     @Id
+    @Column
     @GeneratedValue
     private Long id;
-    @JoinColumn(nullable = false)
-    @ManyToOne
-    private User user;
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "LOCATION_ID", nullable = false)
     @ManyToOne
     private Location location;
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "CAMPAIGNDAY_ID", nullable = false)
     @ManyToOne
     private CampaignDay campaignDay;
-    @Column(nullable = false)
-    @Temporal( TemporalType.TIME)
-    private Date startTime;
-    @Column(nullable = false)
-    @Temporal( TemporalType.TIME)
-    private Date endTime;
-    @Column(nullable = false)
-    private Integer personAmount;
+    @Column(name = "START_TIME", nullable = false)
+    private Long startTime;
 
     public Long getId() {
         return id;
@@ -53,14 +42,6 @@ public class Availability implements Serializable{
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public Location getLocation() {
@@ -79,34 +60,18 @@ public class Availability implements Serializable{
         this.campaignDay = campaignDay;
     }
 
-    public Date getStartTime() {
+    public Long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(Long startTime) {
         this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-    public Integer getPersonAmount() {
-        return personAmount;
-    }
-
-    public void setPersonAmount(Integer personAmount) {
-        this.personAmount = personAmount;
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.id);
+        hash = 29 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
@@ -118,7 +83,7 @@ public class Availability implements Serializable{
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Availability other = (Availability) obj;
+        final LocationTimeSlot other = (LocationTimeSlot) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }

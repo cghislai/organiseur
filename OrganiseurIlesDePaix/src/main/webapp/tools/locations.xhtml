@@ -34,9 +34,6 @@
                     <p:column headerText="Localité">
                         #{location.city}
                     </p:column>
-                    <p:column headerText="Personnes requises">
-                        #{location.requriedPersonAmount}
-                    </p:column>
                     <p:column headerText="Actions">
                         <p:commandButton action="#{locationsController.actionEditLocation(location)}"
                                          value="Modifier"
@@ -53,7 +50,7 @@
                             update=":editForm"/>
                 </p:gmap>
             </h:form>
-            <h:form id="editForm">
+            <h:form id="editForm" >
                 <p:dialog rendered="#{locationsController.editing}"
                           closable="false"
                           visible="true"
@@ -65,28 +62,27 @@
                         <p:messages for=":editForm"/>
                         <h:panelGrid columns="2" styleClass="formTable">
                             <h:outputLabel value="Nom: "/>
-                            <h:inputText value="#{location.name}" required="true" />
+                            <p:inputText value="#{location.name}" required="true" />
                             <h:outputLabel value="Adresse: "/>
-                            <h:inputText value="#{location.address}" required="true" />
+                            <p:inputText value="#{location.address}" required="true" />
                             <h:outputLabel value="Code postal: "/>
-                            <h:inputText value="#{location.postalCode}" required="true" />
+                            <p:inputText value="#{location.postalCode}" required="true" />
                             <h:outputLabel value="Localité: "/>
-                            <h:inputText value="#{location.city}" required="true" />
-                            <h:outputLabel value="Personnes requises : "/>
-                            <p:spinner value="#{location.requriedPersonAmount}" required="true">
-                                <f:validateDoubleRange minimum="1" />
-                            </p:spinner>
+                            <p:inputText value="#{location.city}" required="true" />
+
+                        </h:panelGrid>
+                        <p:commandButton value="Localiser"
+                                         action="#{locationsController.actionSeachCoordinates()}"
+                                         update=":editForm"/>
+                        <h:panelGrid columns="2" styleClass="formTable">
                             <h:outputLabel value="Latitude:"/>
                             <h:outputText value="#{location.latitude}"/>
                             <h:outputLabel value="Longitude:"/>
                             <h:outputText value="#{location.longitude}"/>
                         </h:panelGrid>
-                        <p:commandButton value="Localiser"
-                                         action="#{locationsController.actionSeachCoordinates()}"
-                                         update=":editForm"/>
-                        <p:commandButton value="Enregistrer"
+                        <p:commandButton value="Enregistrer" 
                                          action="#{locationsController.actionSaveLocation()}"
-                                         update=":listForm :editForm"/>
+                                         ajax="false"/>
                         <p:commandButton value="Annuler"
                                          action="#{locationsController.actionCancelEdit()}"
                                          immediate="true"

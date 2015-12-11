@@ -10,8 +10,11 @@ import com.cghislai.organiseurilesdepaix.service.CampaignDatesService;
 import com.cghislai.organiseurilesdepaix.service.search.CampaignDaySearch;
 import com.cghislai.organiseurilesdepaix.util.DateUtils;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -66,6 +69,14 @@ public class CampaignDatesController implements Serializable {
     public void actionRemoveDate(CampaignDay campaignDay) {
         campaignDatesService.removeCampaignDay(campaignDay);
         search();
+    }
+
+    public String getCampaignDateLabel(CampaignDay campaignDay) {
+        if (campaignDay == null) {
+            return null;
+        }
+        DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.FRENCH);
+        return dateFormat.format(campaignDay.getDate());
     }
 
     public Date getToAddDate() {

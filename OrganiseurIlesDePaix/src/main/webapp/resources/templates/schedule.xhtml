@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:idpcomponents="http://xmlns.jcp.org/jsf/composite/idpcomponents"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:outputPanel styleClass="globalSchedule">
+        <h:form id="scheduleForm">
+            <h2>Programme</h2>
+            <idpcomponents:campaigndaySelect campaignDay="#{scheduleController.campaignDay}"
+                                             editable="true">
+                <p:ajax event="change"
+                        update=":scheduleForm:locationList"
+                        listener="#{scheduleController.searchLocationsSlots()}"/>
+            </idpcomponents:campaigndaySelect>
+            <p:dataTable value="#{scheduleController.locationsModel}"
+                         var="locationWithSlotStatus"
+                         lazy="true"
+                         emptyMessage="Aucun emplacement"
+                         first="0"
+                         rows="10"
+                         paginator="true"
+                         paginatorAlwaysVisible="false"
+                         paginatorPosition="bottom"
+                         id="locationList">
+                <p:column headerText="Emplacement">
+                    #{locationWithSlotStatus.location.name}
+                </p:column>
+                <p:column headerText="Créneaux" styleClass="slotRow">
+                    <ui:repeat value="#{timeSlotController.allSlots}"
+                               var="time">
+                        <c:set value="#{locationWithSlotStatus.slots[time]}"
+                               var="slotStatus"/>
+                        <idpcomponents:timeslot styleClass="#{slotStatus == null ? 'closed' : ''} filled-#{slotStatus.subscriptionAmount}"
+                                                label="#{slotStatus == null ? '-' : slotStatus.label}"
+                                                tooltip="#{slotStatus == null ? '' : slotStatus.tooltip}"
+                                                id="slot">
+                        </idpcomponents:timeslot>
+                    </ui:repeat>
+
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:outputPanel>
+</html>
+

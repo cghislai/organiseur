@@ -5,6 +5,8 @@
  */
 package com.cghislai.organiseurilesdepaix.service;
 
+import com.cghislai.organiseurilesdepaix.domain.GlobalPreference;
+import com.cghislai.organiseurilesdepaix.domain.GlobalPreference_;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;

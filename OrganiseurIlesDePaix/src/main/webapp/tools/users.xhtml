@@ -5,7 +5,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:o="http://omnifaces.org/ui">
     <ui:composition template="/template.xhtml">
         <ui:define name="title">
             Édition des utilisateurs
@@ -44,12 +45,85 @@
                                          update=":listForm">
                             <p:confirm header="Confirmation" message="Voulez-vous vraiment supprimer cet utilisateur ?" icon="ui-icon-alert" />
                         </p:commandButton>
+                        <p:commandButton action="#{usersController.actionEdit(user)}"
+                                         value="Éditer"
+                                         update=":editForm">
+                        </p:commandButton>
                     </p:column>
                 </p:dataTable>
                 <p:confirmDialog global="true" >
                     <p:commandButton value="Oui" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
                     <p:commandButton value="Non" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
                 </p:confirmDialog>
+            </h:form>
+            <h:form id="editForm">
+                <p:dialog header="´Édition utilisateur"
+                          rendered="#{usersController.editingUser != null}"
+                          visible="true"
+                          closable="false">
+                    <c:set value="#{usersController.editingUser}"
+                           var="user"/>
+                    <p:messages />
+                    <p:focus/>
+                    <h:panelGrid columns="2"
+                                 styleClass="formTable"
+                                 style="margin: 1em;">
+                        <h:outputLabel value="Nom:"/>
+                        <p:inputText value="#{user.humanName}"
+                                     id="nom"
+                                     required="true"
+                                     requiredMessage="Veuillez entrer un nom"
+                                     validatorMessage="Le nom doit faire minimum 4 charactères">
+                            <f:validateLength minimum="4"/>
+                        </p:inputText>
+                        <h:outputLabel value="E-mail:"/>
+                        <p:inputText value="#{user.email}"
+                                     id="email"
+                                     required="true"
+                                     requiredMessage="Veuillez entrer un e-mail pour pouvoir vous contacter"
+                                     validatorMessage="L'adresse e-mail est incorrecte">
+                            <f:validateLength minimum="4"/>
+                            <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$"/>
+                        </p:inputText>
+                        <h:outputLabel value="Téléphone:"/>
+                        <p:inputText value="#{user.telephone}"
+                                     id="telephone"
+                                     validatorMessage="Le numéro de téléphone est incorrect">
+                            <f:validateRegex pattern="^([0-9]{3,4}/?[0-9]{5,7})?$"/>
+                        </p:inputText>
+                        <h:outputLabel value="Login:"/>
+                        <p:inputText value="#{user.userName}"
+                                     id="login"
+                                     required="true"
+                                     requiredMessage="Veuillez entrer un login"
+                                     validatorMessage="Le login doit faire au moins 4 charactères">
+                        </p:inputText>
+                        <h:outputLabel value="Mot de passe:"/>
+                        <h:panelGroup>
+                            
+                        <p:password value="#{usersController.password1}"
+                                    id="motdepasse"
+                                    validatorMessage="Le mot de passe doit faire minimum 4 charactères">
+                        </p:password>
+                           <h:outputText styleClass="formTip" value="Laisser vide pour garder le même"/>
+                        </h:panelGroup>
+                        <h:outputLabel value="Vérifier le mot de passe:"/>
+                        <p:password value="#{usersController.password2}"
+                                    id="confirmationmotdepasse"
+                                    validatorMessage="Le mot de passe doit faire minimum 8 charactères">
+                            <o:validateEqual components="motdepasse confirmationmotdepasse"
+                                             message="Les mot de passe ne correspondent pas"/>
+                        </p:password>
+                    </h:panelGrid>
+
+                    <p:commandButton value="Enregistrer"
+                                     update="@form :listForm"
+                                     action="#{usersController.actionSaveEdit()}"/>
+                    <p:commandButton value="Annuler"
+                                     update="@form"
+                                     immediate="true"
+                                     action="#{usersController.actionCancelEdit()}"/>
+                </p:dialog>
             </h:form>
         </ui:define>
     </ui:composition>

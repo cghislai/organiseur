@@ -5,196 +5,327 @@
  */
 package com.cghislai.organiseurilesdepaix.view.control;
 
-import com.cghislai.organiseurilesdepaix.domain.Availability;
 import com.cghislai.organiseurilesdepaix.domain.CampaignDay;
 import com.cghislai.organiseurilesdepaix.domain.Location;
-import com.cghislai.organiseurilesdepaix.domain.User;
-import com.cghislai.organiseurilesdepaix.service.AvailabilityService;
+import com.cghislai.organiseurilesdepaix.domain.LocationTimeSlot;
+import com.cghislai.organiseurilesdepaix.domain.Subscription;
+import com.cghislai.organiseurilesdepaix.domain.util.Pagination;
 import com.cghislai.organiseurilesdepaix.service.CampaignDatesService;
-import com.cghislai.organiseurilesdepaix.service.search.AvailabilitySearch;
-import com.cghislai.organiseurilesdepaix.service.search.CampaignDaySearch;
-import com.cghislai.organiseurilesdepaix.util.DateUtils;
+import com.cghislai.organiseurilesdepaix.service.LocationService;
+import com.cghislai.organiseurilesdepaix.service.LocationTimeSlotService;
+import com.cghislai.organiseurilesdepaix.service.SubscriptionService;
+import com.cghislai.organiseurilesdepaix.service.search.LocationSearch;
+import com.cghislai.organiseurilesdepaix.service.search.LocationTimeSlotSearch;
+import com.cghislai.organiseurilesdepaix.service.search.SubscriptionSearch;
+import com.cghislai.organiseurilesdepaix.view.domain.LocationDayWithSlotsStatus;
+import com.cghislai.organiseurilesdepaix.view.domain.SlotStatus;
 import java.io.Serializable;
-import java.util.Date;
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.faces.view.ViewScoped;
+import javax.enterprise.context.SessionScoped;
+import javax.faces.FacesException;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.primefaces.event.ScheduleEntryMoveEvent;
-import org.primefaces.event.ScheduleEntryResizeEvent;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.model.DefaultScheduleEvent;
-import org.primefaces.model.DefaultScheduleModel;
-import org.primefaces.model.LazyScheduleModel;
-import org.primefaces.model.ScheduleEvent;
-import org.primefaces.model.ScheduleModel;
+import org.primefaces.event.map.OverlaySelectEvent;
+import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortMeta;
+import org.primefaces.model.SortOrder;
+import org.primefaces.model.map.DefaultMapModel;
+import org.primefaces.model.map.LatLng;
+import org.primefaces.model.map.Marker;
 
 /**
  *
  * @author cghislai
  */
 @Named
-@ViewScoped
+@SessionScoped
 public class AvailabilitiesController implements Serializable {
 
     @Inject
     private AuthController authController;
-    @Inject
-    private GlobalPreferencesController globalPreferencesController;
     @EJB
-    private AvailabilityService availabilityService;
+    private SubscriptionService subscriptionService;
+    @EJB
+    private LocationService locationService;
+    @EJB
+    private LocationTimeSlotService locationTimeSlotService;
     @EJB
     private CampaignDatesService campaignDatesService;
+    @Inject
+    private TimeSlotController timeSlotController;
+    @Inject
+    private CampaignDatesController campaignDatesController;
 
-    private List<CampaignDay> campaignDays;
-    private List<Location> locations;
-    // Schedule models location x days
-    private ScheduleModel[][] models;
-    private Availability editingAvailability;
+    private LazyDataModel<Location> locationsModel;
+    private Location selectedLocation;
+    private LocationSearch locationSearch;
+    private DefaultMapModel googleMapModel;
+
+    private List<CampaignDay> allCampaignDays;
+
+    private Map<CampaignDay, LocationDayWithSlotsStatus> slotsStatusMap;
 
     @PostConstruct
     public void init() {
-        User authenticatedUser = authController.getAuthenticatedUser();
-        AvailabilitySearch availabilitySearch = new AvailabilitySearch();
-        availabilitySearch.setUser(authenticatedUser);
-        campaignDays = availabilityService.findAvailabilitiesDays(availabilitySearch);
-        locations = availabilityService.findAvailabilitiesLocations(availabilitySearch);
-
-        models = new ScheduleModel[locations.size()][campaignDays.size()];
+        locationSearch = new LocationSearch();
+        googleMapModel = new DefaultMapModel();
+        searchLocations();
+        searchCampaignDays();
+        searchSlotsStatus();
     }
 
-    public ScheduleModel getScheduleModel(Location location, CampaignDay campaignDay) {
-        int locationIndex = locations.indexOf(location);
-        int campaignDayIndex = campaignDays.indexOf(campaignDay);
-        ScheduleModel model = models[locationIndex][campaignDayIndex];
-        if (model == null) {
-            model = new MyScheduleModel(location, campaignDay);
-            models[locationIndex][campaignDayIndex] = model;
-        }
-        return model;
+    private void searchCampaignDays() {
+        allCampaignDays = campaignDatesService.findAllDays();
     }
 
-    public void onEventSelect(SelectEvent selectEvent) {
-        Boolean registrationClosed = globalPreferencesController.getRegistrationClosed();
-        if (registrationClosed) {
+    public void searchLocations() {
+        checkLocationSearch();
+        locationsModel = new LocationsModel();
+        updateMarkers();
+    }
+
+    public void actionSelectLocation(Location location) {
+        this.selectedLocation = location;
+        this.searchSlotsStatus();
+        updateMarkers();
+    }
+
+    public void searchSlotsStatus() {
+        slotsStatusMap = null;
+        if (selectedLocation == null) {
             return;
         }
-        MyScheduleEvent event = (MyScheduleEvent) selectEvent.getObject();
-        editingAvailability = event.getAvailabilitiy();
+        slotsStatusMap = new HashMap<>();
+        allCampaignDays.stream().forEach((campaignDay) -> {
+            Map<Long, SlotStatus> slotsMap = createSlotsStatusMap(campaignDay);
+            LocationDayWithSlotsStatus locationWithSlots = new LocationDayWithSlotsStatus();
+            locationWithSlots.setCampaignDay(campaignDay);
+            locationWithSlots.setLocation(selectedLocation);
+            locationWithSlots.setSlots(slotsMap);
+            slotsStatusMap.put(campaignDay, locationWithSlots);
+        });
     }
 
-    public void onEventMove(ScheduleEntryMoveEvent event) {
-        int minuteDelta = event.getMinuteDelta();
-        MyScheduleEvent scheduleEvent = (MyScheduleEvent) event.getScheduleEvent();
-        Availability availabilitiy = scheduleEvent.getAvailabilitiy();
-        Date startTime = availabilitiy.getStartTime();
-        Date newStartTime = DateUtils.addMinutes(startTime, minuteDelta);
-        availabilitiy.setStartTime(newStartTime);
-        Date endTime = availabilitiy.getEndTime();
-        Date newEndTime = DateUtils.addMinutes(endTime, minuteDelta);
-        availabilitiy.setEndTime(newEndTime);
-
-        Availability newAvailabilitiy = availabilityService.saveAvailability(availabilitiy);
-        scheduleEvent.setAvailabilitiy(newAvailabilitiy);
+    private Map<Long, SlotStatus> createSlotsStatusMap(CampaignDay campaignDay1) {
+        List<Long> timeSlots = timeSlotController.getAllSlots();
+        Map<Long, SlotStatus> slotsMap = new HashMap<>();
+        timeSlots.stream().forEach((Long time) -> {
+            createSlotStatus(campaignDay1, time, slotsMap);
+        });
+        return slotsMap;
     }
 
-    public void onEventResize(ScheduleEntryResizeEvent event) {
-        int minuteDelta = event.getMinuteDelta();
-        MyScheduleEvent scheduleEvent = (MyScheduleEvent) event.getScheduleEvent();
-        Availability availabilitiy = scheduleEvent.getAvailabilitiy();
-        Date endTime = availabilitiy.getEndTime();
-        Date newEndTime = DateUtils.addMinutes(endTime, minuteDelta);
-        availabilitiy.setEndTime(newEndTime);
+    private void createSlotStatus(CampaignDay campaignDay1, Long time, Map<Long, SlotStatus> slotsMap) throws FacesException {
+        LocationTimeSlotSearch locationTimeSlotSearch = new LocationTimeSlotSearch();
+        locationTimeSlotSearch.setCampaignDay(campaignDay1);
+        locationTimeSlotSearch.setLocation(selectedLocation);
+        locationTimeSlotSearch.setStartHour(time);
+        List<LocationTimeSlot> locationsSlots = locationTimeSlotService.searchLocationTimeSlots(locationTimeSlotSearch, null);
+        if (locationsSlots.size() > 1) {
+            throw new FacesException("Multiple location slot");
+        }
+        if (locationsSlots.isEmpty()) {
+            slotsMap.put(time, null);
+            return;
+        }
+        LocationTimeSlot locationSlot = locationsSlots.get(0);
+        SubscriptionSearch subscriptionSearch = new SubscriptionSearch();
+        subscriptionSearch.setCampaignDay(campaignDay1);
+        subscriptionSearch.setLocation(selectedLocation);
+        subscriptionSearch.setStartHour(time);
+        Long subscriptionsCount = subscriptionService.countSubscriptions(subscriptionSearch);
+        List<Subscription> subscriptions = subscriptionService.searchSubscriptions(subscriptionSearch, new Pagination(0, 5));
 
-        Availability newAvailabilitiy = availabilityService.saveAvailability(availabilitiy);
-        scheduleEvent.setAvailabilitiy(newAvailabilitiy);
-    }
-    
-    public void actionNewEvent(CampaignDay campaignDay, Location location) {
-        editingAvailability = new Availability();
-        User authenticatedUser = authController.getAuthenticatedUser();
-        editingAvailability.setCampaignDay(campaignDay);
-        editingAvailability.setLocation(location);
-        editingAvailability.setPersonAmount(1);
-        editingAvailability.setUser(authenticatedUser);
-    }
-    
-    public void deleteEvent() {
-        availabilityService.removeAvailability(editingAvailability);
-        editingAvailability = null;
-    }
-    public void saveEvent() {
-        Availability savedAvailability = availabilityService.saveAvailability(editingAvailability);
-        editingAvailability = null;
+        subscriptionSearch.setUser(authController.getAuthenticatedUser());
+        Long userSubscriptionCount = subscriptionService.countSubscriptions(subscriptionSearch);
+        boolean userSubscribed = userSubscriptionCount > 0;
+
+        String timeLabel = timeSlotController.getSlotLabel(time);
+        String amountLabel = (subscriptionsCount == 0 ? "Aucune" : subscriptionsCount)
+                + " personne"
+                + (subscriptionsCount > 1 ? "s" : "");
+        String subscribedLabel = (userSubscribed ? "(Inscrit)" : "");
+        String label = timeLabel + "<br>" + amountLabel + "<br>" + subscribedLabel;
+        String usersLabel = subscriptions.stream()
+                .map(subscription -> subscription.getUser().getHumanName())
+                .reduce("", (userNames, userName) -> (userNames.isEmpty() ? "" : userNames + "<br>") + userName);
+        if (subscriptions.size() < subscriptionsCount) {
+            long diff = subscriptionsCount - subscriptions.size();
+            usersLabel += "<br>Et " + diff + " autre" + (diff > 1 ? "s" : "");
+        }
+        SlotStatus slotStatus = new SlotStatus();
+        slotStatus.setSubscriptionAmount(subscriptionsCount);
+        slotStatus.setTimeSlot(locationSlot);
+        slotStatus.setLabel(label);
+        slotStatus.setTooltip(usersLabel);
+        slotStatus.setUserSubscribed(userSubscribed);
+
+        long otherPersonAmount = subscriptionsCount;
+        if (userSubscribed) {
+            otherPersonAmount--;
+        }
+        slotStatus.setEditable(otherPersonAmount < 2);
+        slotsMap.put(time, slotStatus);
     }
 
-    public List<CampaignDay> getCampaignDays() {
-        return campaignDays;
+    private void updateMarkers() {
+        locationSearch.setPagination(null);
+        List<Location> locations = locationService.findLocations(locationSearch);
+        googleMapModel.getMarkers().clear();
+
+        if (locations.isEmpty()) {
+            return;
+        }
+
+        locations.stream().map((location) -> {
+            BigDecimal latitude = location.getLatitude();
+            BigDecimal longitude = location.getLongitude();
+            if (latitude == null || longitude == null) {
+                return null;
+            }
+            String name = location.getName();
+            LatLng latLng = new LatLng(latitude.floatValue(), longitude.floatValue());
+            Marker marker = new Marker(latLng, name);
+            marker.setData(location);
+            boolean selected = location.equals(selectedLocation);
+            if (selected) {
+                marker.setIcon("https://maps.google.com/mapfiles/kml/paddle/red-stars.png");
+            } else {
+                marker.setIcon("https://maps.google.com/mapfiles/kml/paddle/wht-circle.png");
+            }
+            return marker;
+        }).forEach((marker) -> {
+            if (marker != null) {
+                googleMapModel.addOverlay(marker);
+            }
+        });
     }
 
-    public List<Location> getLocations() {
-        return locations;
+    public void onMarkerSelect(OverlaySelectEvent event) {
+        Marker marker = (Marker) event.getOverlay();
+        Location location = (Location) marker.getData();
+        boolean selected = location.equals(selectedLocation);
+        if (selected) {
+            actionSelectLocation(null);
+        } else {
+            actionSelectLocation(location);
+        }
     }
 
-    public Availability getEditingAvailability() {
-        return editingAvailability;
+    public void onSubscribedChanged(SlotStatus slotStatus, boolean subscribed) {
+        if (slotStatus == null || !slotStatus.isEditable()) {
+            return;
+        }
+        LocationTimeSlot timeSlot = slotStatus.getTimeSlot();
+        SubscriptionSearch subscriptionSearch = new SubscriptionSearch();
+        subscriptionSearch.setCampaignDay(timeSlot.getCampaignDay());
+        subscriptionSearch.setStartHour(timeSlot.getStartTime());
+        subscriptionSearch.setUser(authController.getAuthenticatedUser());
+        if (subscribed) {
+            long subscriptionCount = subscriptionService.countSubscriptions(subscriptionSearch);
+            if (subscriptionCount > 0) {
+                List<Subscription> subscriptions = subscriptionService.searchSubscriptions(subscriptionSearch, null);
+                for (Subscription subscription : subscriptions) {
+                    FacesContext facesContext = FacesContext.getCurrentInstance();
+                    FacesMessage facesMessage = new FacesMessage();
+                    String title = "Déjà inscrit";
+                    String label = "Déjà inscrit le " + campaignDatesController.getCampaignDateLabel(subscription.getLocationTimeSlot().getCampaignDay());
+                    label += " pour " + timeSlotController.getSlotLabel(subscription.getLocationTimeSlot().getStartTime());
+                    label += " à l'emplacement " + subscription.getLocationTimeSlot().getLocation().getName();
+                    facesMessage.setSeverity(FacesMessage.SEVERITY_ERROR);
+                    facesMessage.setSummary(title);
+                    facesMessage.setDetail(label);
+                    facesContext.addMessage(null, facesMessage);
+                }
+                return;
+            }
+            Subscription subscription = new Subscription();
+            subscription.setLocationTimeSlot(timeSlot);
+            subscription.setUser(authController.getAuthenticatedUser());
+            subscriptionService.saveSubscription(subscription);
+        } else {
+            subscriptionSearch.setLocation(selectedLocation);
+            List<Subscription> subscriptions = subscriptionService.searchSubscriptions(subscriptionSearch, null);
+            if (subscriptions.size() != 1) {
+                throw new FacesException("Not a single subscription");
+            }
+            subscriptionService.deleteSubscription(subscriptions.get(0));
+        }
+        searchSlotsStatus();
+        authController.searchSubscribed();
     }
 
-    private class MyScheduleModel extends LazyScheduleModel {
+    private void checkLocationSearch() {
+        String cityLike = locationSearch.getCityLike();
+        if (cityLike != null && cityLike.trim().isEmpty()) {
+            locationSearch.setCityLike(null);
+        }
+        String nameLike = locationSearch.getNameLike();
+        if (nameLike != null && nameLike.trim().isEmpty()) {
+            locationSearch.setNameLike(null);
+        }
+        String postalCode = locationSearch.getPostalCode();
+        if (postalCode != null && postalCode.trim().isEmpty()) {
+            locationSearch.setPostalCode(null);
+        }
+    }
 
-        private final Location location;
-        private final CampaignDay campaignDay;
-        private AvailabilitySearch availabilitySearch;
+    public List<CampaignDay> getAllCampaignDays() {
+        return allCampaignDays;
+    }
 
-        public MyScheduleModel(Location location, CampaignDay campaignDay) {
-            this.location = location;
-            this.campaignDay = campaignDay;
-            User authenticatedUser = authController.getAuthenticatedUser();
-            availabilitySearch = new AvailabilitySearch();
-            availabilitySearch.setCampaignDay(campaignDay);
-            availabilitySearch.setLocation(location);
-            availabilitySearch.setUser(authenticatedUser);
+    public Map<CampaignDay, LocationDayWithSlotsStatus> getSlotsStatusMap() {
+        return slotsStatusMap;
+    }
+
+    public DefaultMapModel getGoogleMapModel() {
+        return googleMapModel;
+    }
+
+    public LocationSearch getLocationSearch() {
+        return locationSearch;
+    }
+
+    public void setLocationSearch(LocationSearch locationSearch) {
+        this.locationSearch = locationSearch;
+    }
+
+    public LazyDataModel<Location> getLocationsModel() {
+        return locationsModel;
+    }
+
+    public Location getSelectedLocation() {
+        return selectedLocation;
+    }
+
+    private class LocationsModel extends LazyDataModel<Location> {
+
+        @Override
+        public List<Location> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, Object> filters) {
+            return loadData(first, pageSize);
         }
 
         @Override
-        public void loadEvents(Date start, Date end) {
-            List<Availability> availabilities = availabilityService.findAvailabilities(availabilitySearch);
-            for (Availability availabilitiy : availabilities) {
-                MyScheduleEvent event = new MyScheduleEvent(availabilitiy);
-                addEvent(event);
-            }
+        public List<Location> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+            return loadData(first, pageSize);
         }
 
-    }
+        private List<Location> loadData(int first, int pageSize) {
+            Pagination pagination = new Pagination(first, pageSize);
+            locationSearch.setPagination(pagination);
 
-    private class MyScheduleEvent extends DefaultScheduleEvent {
+            Long locationCount = locationService.countLocation(locationSearch);
+            setRowCount(locationCount.intValue());
 
-        private Availability availabilitiy;
-
-        public MyScheduleEvent(Availability availabilitiy) {
-            this.availabilitiy = availabilitiy;
-            setData(availabilitiy);
-            setTitle(availabilitiy.getPersonAmount() + " personne(s)");
-            CampaignDay campaignDay = availabilitiy.getCampaignDay();
-            Date campaignDate = campaignDay.getDate();
-            Date startTime = availabilitiy.getStartTime();
-            Date startDate = DateUtils.timeAndDay(startTime, campaignDate);
-            setStartDate(startDate);
-            Date endTime = availabilitiy.getEndTime();
-            Date endDate = DateUtils.timeAndDay(endTime, campaignDate);
-            setEndDate(endDate);
-            final Boolean registrationClosed = globalPreferencesController.getRegistrationClosed();
-            setEditable(registrationClosed == null || registrationClosed == false);
-        }
-
-        public Availability getAvailabilitiy() {
-            return availabilitiy;
-        }
-
-        public void setAvailabilitiy(Availability availabilitiy) {
-            this.availabilitiy = availabilitiy;
+            List<Location> locaitons = locationService.findLocations(locationSearch);
+            return locaitons;
         }
 
     }

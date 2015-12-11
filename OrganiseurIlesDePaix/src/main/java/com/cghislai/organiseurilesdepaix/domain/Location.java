@@ -20,7 +20,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "location")
-public class Location implements Serializable {
+public class Location implements Serializable, WithId {
 
     @Id
     @GeneratedValue
@@ -37,8 +37,6 @@ public class Location implements Serializable {
     private BigDecimal latitude;
     @Column
     private BigDecimal longitude;
-    @Column(name="PERSON_AMOUNT")
-    private Integer requriedPersonAmount;
 
     public Long getId() {
         return id;
@@ -94,14 +92,6 @@ public class Location implements Serializable {
 
     public void setLongitude(BigDecimal longitude) {
         this.longitude = longitude;
-    }
-
-    public Integer getRequriedPersonAmount() {
-        return requriedPersonAmount;
-    }
-
-    public void setRequriedPersonAmount(Integer requriedPersonAmount) {
-        this.requriedPersonAmount = requriedPersonAmount;
     }
 
     @Override

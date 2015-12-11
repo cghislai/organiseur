@@ -22,7 +22,7 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "campaign_day")
-public class CampaignDay implements Serializable {
+public class CampaignDay implements Serializable, WithId {
 
     @Id
     @GeneratedValue

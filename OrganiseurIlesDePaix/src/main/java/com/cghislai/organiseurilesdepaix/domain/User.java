@@ -5,6 +5,7 @@
  */
 package com.cghislai.organiseurilesdepaix.domain;
 
+import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,7 +19,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "ouser")
-public class User {
+public class User implements Serializable, WithId {
 
     @Id
     @GeneratedValue
@@ -27,12 +28,14 @@ public class User {
     private String userName;
     @Column(nullable = false)
     private String email;
-    @Column(name = "PASSWORD_HASH", nullable = false)
+    @Column(name = "PASSWORD_HASH")
     private String passwordHash;
     @Column(name = "IS_ADMIN", nullable = false)
     private boolean admin;
-    @Column(name = "HUMAN_NAME")
+    @Column(name = "HUMAN_NAME", nullable = false)
     private String humanName;
+    @Column(name = "TELEPHONE")
+    private String telephone;
 
     public Long getId() {
         return id;
@@ -80,6 +83,14 @@ public class User {
 
     public void setHumanName(String humanName) {
         this.humanName = humanName;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 
     @Override

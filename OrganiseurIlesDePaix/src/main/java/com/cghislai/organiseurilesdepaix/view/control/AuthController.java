@@ -6,14 +6,16 @@
 package com.cghislai.organiseurilesdepaix.view.control;
 
 import com.cghislai.organiseurilesdepaix.domain.User;
+import com.cghislai.organiseurilesdepaix.service.SubscriptionService;
+import com.cghislai.organiseurilesdepaix.service.search.SubscriptionSearch;
 import com.cghislai.organiseurilesdepaix.view.Views;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -27,11 +29,11 @@ import javax.servlet.http.HttpSession;
 @SessionScoped
 public class AuthController implements Serializable {
 
-    @Inject
-    private UserSessionController userSessionController;
-    
-    
+    @EJB
+    private SubscriptionService subscriptionService;
+
     private User authenticatedUser;
+    private boolean userSubscribed;
 
     public User getAuthenticatedUser() {
         return authenticatedUser;
@@ -39,7 +41,14 @@ public class AuthController implements Serializable {
 
     public void actionAuthenticateUser(User user) {
         authenticatedUser = user;
-        userSessionController.updateAvailabilities();;
+        searchSubscribed();
+    }
+
+    public void searchSubscribed() {
+        SubscriptionSearch subscriptionSearch = new SubscriptionSearch();
+        subscriptionSearch.setUser(authenticatedUser);
+        Long subscriptionCount = subscriptionService.countSubscriptions(subscriptionSearch);
+        userSubscribed = subscriptionCount > 0;
     }
 
     public String actionDeauthenticateUser() {
@@ -49,7 +58,6 @@ public class AuthController implements Serializable {
         try {
             request.logout();
             authenticatedUser = null;
-            userSessionController.updateAvailabilities();;
         } catch (ServletException ex) {
             Logger.getLogger(AuthController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -67,4 +75,9 @@ public class AuthController implements Serializable {
     public boolean isAdminAuthenticated() {
         return authenticatedUser != null && authenticatedUser.isAdmin();
     }
+
+    public boolean isUserSubscribed() {
+        return userSubscribed;
+    }
+
 }

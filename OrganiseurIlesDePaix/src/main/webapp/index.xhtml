@@ -12,21 +12,24 @@
             <h:form>
                 <p:outputPanel rendered="#{globalPreferencesController.registrationClosed}"
                                styleClass="infoTip">
-                    L'enregistrement des disponibilités est cloturé.
+                    <h:outputText value="Les inscriptions sont clôturées"/>
                 </p:outputPanel>
-                <p:outputPanel rendered="#{globalPreferencesController.scheduleOnline}"
-                               styleClass="infoTip">
-                    Le programme est disponible.
-                    <p:outputPanel rendered="#{authController.userAuthenticated}">
-                        <h:outputLink value="user/schedule.jsf">Consultez votre programme</h:outputLink>
-                    </p:outputPanel>
-                </p:outputPanel>
-                <p:outputPanel rendered="#{not authController.userAuthenticated}">
-                    <p>Vous devez vous connecter pour enregistrer vos disponibilités ou consulter le programme.</p>
-                    <h:outputLink value="user/login.jsf">Se connecter</h:outputLink><br/>
+                <p:outputPanel rendered="#{not authController.userAuthenticated and not globalPreferencesController.registrationClosed}"
+                               styleClass="welcomeBlock">
+                    <p>Vous devez vous connecter pour enregistrer vos disponibilités.</p>
+                    <h:outputLink value="user/login.jsf">Se connecter</h:outputLink>
                     <h:outputLink value="user/register.jsf">Créer un compte</h:outputLink>
                 </p:outputPanel>
+                <p:outputPanel rendered="#{authController.userAuthenticated and not authController.userSubscribed and not globalPreferencesController.registrationClosed}"
+                               styleClass="welcomeBlock">
+                    <h:outputLink value="user/availabilities.jsf">
+                        Enregistrer ses disponibilités
+                    </h:outputLink>
+                </p:outputPanel>
             </h:form>
+
+            <ui:include src="user/schedule.xhtml" />
+            <ui:include src="resources/templates/schedule.xhtml"/>
         </ui:define>
     </ui:composition>
 </html>
